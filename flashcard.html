@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Capybara Themed Flashcard Test (Scalable UI)</title>
+
+  <!-- Example Google Font (Montserrat) -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap">
+
+  <style>
+    /* ====== General Styling ====== */
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Montserrat', sans-serif;
+      margin: 0;
+      padding: 0;
+      /* Replace 'capybara-theme.png' with the actual file name or URL of your capybara image */
+      background: url('capybara-theme.png') no-repeat center center fixed;
+      background-size: cover;
+      color: #333;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    h1 {
+      margin-top: 2vw;
+      margin-bottom: 1vw;
+      color: #2c2c2c;
+      text-shadow: 0.2vw 0.2vw 0.4vw #fff;
+      background: rgba(255,255,255,0.6);
+      padding: 1vw 2vw;
+      border-radius: 0.8vw;
+      font-size: 2vw; /* scale heading with viewport width */
+    }
+
+    /* Container sections */
+    .controls,
+    #csv-import,
+    #question-form {
+      width: 90%;
+      max-width: 900px;
+      background: rgba(255,255,255,0.7);
+      border-radius: 8px;
+      padding: 2vw;
+      margin: 1vw 0;
+      box-shadow: 0 0.4vw 0.8vw rgba(0,0,0,0.2);
+      position: relative;
+    }
+
+    /* Submit button: scaled via VW, fixed position but uses VW for spacing */
+    #submit-btn {
+      position: fixed;
+      left: 2vw;              /* scaled horizontally */
+      top: 50vh;             /* still vertically centered with 50% of viewport height */
+      transform: translateY(-50%);
+      z-index: 999;
+      background: #E6A15E;   /* warm orange/brown */
+      color: #fff;
+      border-radius: 1vw;
+      box-shadow: 0.4vw 0.4vw 0.8vw rgba(0,0,0,0.3);
+      font-size: 2vw;        /* scale font with viewport width */
+      padding: 1.2vw 2vw;    /* scaled padding */
+      border: none;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    #submit-btn:hover {
+      background: #d89054;
+    }
+
+    /* The top-right container for score info, scaled via VW for text */
+   #score-container {
+  position: fixed;
+  top: 1vw;
+  right: 1vw;
+  background: rgba(255,255,255,0.7);
+  border-radius: 0.8vw;
+  padding: 1vw 1.5vw;
+  box-shadow: 0 0.4vw 0.8vw rgba(0,0,0,0.2);
+  text-align: right;
+  z-index: 999;
+  min-width: 10vw;
+
+  /* ↓↓↓ These two lines scale the entire box to ~70% and pivot from the top-right corner ↓↓↓ */
+  transform: scale(0.7);
+  transform-origin: top right;
+}
+
+    #score-container p {
+      margin: 0.5vw 0;
+      font-weight: bold;
+      color: #2c2c2c;
+      font-size: 1.2vw; /* scale text size with viewport width */
+    }
+
+    button {
+      margin: 0.5vw;
+      padding: 1vw 1.5vw;
+      font-size: 1vw;
+      background: #007BFF;
+      color: #fff;
+      border: none;
+      border-radius: 0.8vw;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+
+    #flashcards-container {
+      width: 90%;
+      max-width: 900px;
+      margin: 1vw 0;
+    }
+    .flashcard {
+      background: rgba(255,255,255,0.8);
+      border-radius: 0.8vw;
+      padding: 2vw;
+      margin-bottom: 2vw;
+      box-shadow: 0 0.4vw 0.8vw rgba(0,0,0,0.2);
+      transition: transform 0.2s;
+      position: relative;
+    }
+    .flashcard:hover {
+      transform: scale(1.02);
+    }
+    .question {
+      font-size: 1.2vw;
+      margin-bottom: 1vw;
+      font-weight: bold;
+      color: #2c2c2c;
+    }
+    .options {
+      list-style: none;
+      padding: 0;
+    }
+    .options li {
+      padding: 1vw 1.5vw;
+      margin: 1vw 0;
+      background: #f1f1f1;
+      border-radius: 0.5vw;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+      font-size: 1vw;
+    }
+    .options li:hover {
+      background: #e0e0e0;
+    }
+    .options li.selected {
+      background: #5563DE;
+      color: #fff;
+    }
+    .feedback {
+      font-size: 1vw;
+      font-weight: bold;
+      text-align: center;
+      margin-top: 1vw;
+      padding: 1vw;
+      border-radius: 0.8vw;
+      display: none;
+    }
+    .feedback.correct {
+      background: #4CAF50;
+      color: #fff;
+    }
+    .feedback.incorrect {
+      background: #F44336;
+      color: #fff;
+    }
+    label {
+      display: block;
+      margin-bottom: 0.5vw;
+      font-weight: bold;
+      color: #2c2c2c;
+      font-size: 1vw;
+    }
+    input[type="text"] {
+      width: 100%;
+      padding: 0.8vw;
+      margin-bottom: 0.5vw;
+      border-radius: 0.5vw;
+      border: 0.1vw solid #ccc;
+      font-size: 1vw;
+    }
+    .radio-group {
+      display: flex;
+      align-items: center;
+      margin: 0.5vw 0;
+    }
+    .radio-group input[type="radio"] {
+      margin-right: 0.5vw;
+      transform: scale(1.5); /* Make the radio a bit bigger if desired */
+    }
+    .remove-btn {
+      position: absolute;
+      top: 1vw;
+      right: 1vw;
+      background: #f44336;
+      font-size: 1vw;
+      padding: 0.5vw 1vw;
+    }
+    .remove-btn:hover {
+      background: #c0392b;
+    }
+    #review-toggle {
+      margin: 0.5vw 1vw 0.5vw 0;
+      font-size: 1vw;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Capybara Themed Flashcard Test</h1>
+
+  <!-- Score Info in top-right corner -->
+  <div id="score-container">
+    <p id="score">You answered 0 out of 0 correctly (0%).</p>
+    <p id="best-score">Best Score (All Time): 0%</p>
+    <p id="time-taken">Time Taken: 0 seconds</p>
+  </div>
+
+  <!-- Controls Section -->
+  <div class="controls">
+    <button id="remove-all-btn">Remove All Questions</button>
+    <button id="shuffle-btn">Shuffle Questions</button>
+    <button id="reset-btn">Reset Test</button>
+    <button id="review-toggle">Review Mode: OFF</button>
+  </div>
+
+  <!-- CSV Import Section -->
+  <div id="csv-import">
+    <h2>Import Questions from CSV</h2>
+    <p><em>Rows can have 6 columns (4 options) or 7 columns (5 options) + final column for correct answer.</em></p>
+    <input type="file" id="csv-file" accept=".csv" />
+    <button id="csv-import-btn">Import from CSV</button>
+  </div>
+
+  <!-- ADD NEW QUESTION FORM -->
+  <div id="question-form">
+    <h2>Add New Question</h2>
+    <div>
+      <label for="new-question">Question:</label>
+      <input type="text" id="new-question" placeholder="Enter your question..." />
+    </div>
+    <label>Options (up to 5):</label>
+    <div class="radio-group">
+      <input type="radio" name="correctOption" value="0" checked />
+      <input type="text" id="option0" placeholder="Option A" />
+    </div>
+    <div class="radio-group">
+      <input type="radio" name="correctOption" value="1" />
+      <input type="text" id="option1" placeholder="Option B" />
+    </div>
+    <div class="radio-group">
+      <input type="radio" name="correctOption" value="2" />
+      <input type="text" id="option2" placeholder="Option C (optional)" />
+    </div>
+    <div class="radio-group">
+      <input type="radio" name="correctOption" value="3" />
+      <input type="text" id="option3" placeholder="Option D (optional)" />
+    </div>
+    <div class="radio-group">
+      <input type="radio" name="correctOption" value="4" />
+      <input type="text" id="option4" placeholder="Option E (optional)" />
+    </div>
+    <button id="add-question-btn">Add Question</button>
+  </div>
+  
+  <!-- The main container for flashcards -->
+  <div id="flashcards-container"></div>
+  
+  <!-- Submit button (scaled via VW, fixed on the left side) -->
+  <button id="submit-btn">Submit Test</button>
+
+  <!-- Audio elements for success/fail sounds (optional) -->
+  <audio id="success-sound">
+    <source src="success.mp3" type="audio/mpeg">
+    Your browser does not support the audio element or success.mp3 is missing.
+  </audio>
+  <audio id="fail-sound">
+    <source src="fail.mp3" type="audio/mpeg">
+    Your browser does not support the audio element or fail.mp3 is missing.
+  </audio>
+
+  <!-- Confetti library (CDN) -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+
+  <script>
+    /* ============================
+       Minimal spaced repetition quiz code 
+       with scaled UI elements
+       ============================ */
+    let flashcards = [
+      {
+        question: "Sample Q: Which factor increases voluntary alcohol consumption in capybaras? (Just a theme example!)",
+        options: [
+          "Offering them only unsweetened water",
+          "Sweetening with sucrose or using food/water deprivation",
+          "Exposing them only to high doses that produce sedation",
+          "Using capybara-friendly herbal infusions",
+          "Fifth option for demonstration"
+        ],
+        answer: "Sweetening with sucrose or using food/water deprivation",
+        nextDue: 0
+      }
+    ];
+
+    let startTime;
+    let bestScore = 0;
+    let reviewMode = false;
+
+    const container       = document.getElementById('flashcards-container');
+    const removeAllBtn    = document.getElementById('remove-all-btn');
+    const submitBtn       = document.getElementById('submit-btn');
+    const shuffleBtn      = document.getElementById('shuffle-btn');
+    const resetBtn        = document.getElementById('reset-btn');
+    const scoreDiv        = document.getElementById('score');
+    const bestScoreDiv    = document.getElementById('best-score');
+    const timeTakenDiv    = document.getElementById('time-taken');
+    const successSound    = document.getElementById('success-sound');
+    const failSound       = document.getElementById('fail-sound');
+    const reviewToggleBtn = document.getElementById('review-toggle');
+
+    const addQuestionBtn  = document.getElementById('add-question-btn');
+    const newQuestionEl   = document.getElementById('new-question');
+    const optionEls       = [
+      document.getElementById('option0'),
+      document.getElementById('option1'),
+      document.getElementById('option2'),
+      document.getElementById('option3'),
+      document.getElementById('option4')
+    ];
+
+    const csvFileInput    = document.getElementById('csv-file');
+    const csvImportBtn    = document.getElementById('csv-import-btn');
+
+    function loadFromLocalStorage() {
+      const saved = localStorage.getItem('flashcardsData');
+      if (saved) {
+        flashcards = JSON.parse(saved);
+      }
+    }
+    function saveToLocalStorage() {
+      localStorage.setItem('flashcardsData', JSON.stringify(flashcards));
+    }
+
+    if (localStorage.getItem('bestScore')) {
+      bestScore = parseInt(localStorage.getItem('bestScore'), 10);
+      bestScoreDiv.textContent = `Best Score (All Time): ${bestScore}%`;
+    }
+
+    function isQuestionDue(card) {
+      return !card.nextDue || card.nextDue <= Date.now();
+    }
+
+    function shuffleArray(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+    }
+
+    function getVisibleFlashcards() {
+      return reviewMode ? flashcards.filter(isQuestionDue) : flashcards;
+    }
+
+    function renderFlashcards() {
+      const visibleCards = getVisibleFlashcards();
+      container.innerHTML = '';
+
+      if (!visibleCards.length) {
+        const msg = reviewMode
+          ? "No questions are currently due. Toggle Review Mode OFF or add new questions."
+          : "No questions available. Add or import some first.";
+        container.innerHTML = `<p style="color: #2c2c2c; font-weight: bold; background: rgba(255,255,255,0.8); padding: 1vw; border-radius: 0.8vw;">${msg}</p>`;
+        return;
+      }
+
+      visibleCards.forEach((card, index) => {
+        const cardDiv = document.createElement('div');
+        cardDiv.classList.add('flashcard');
+
+        const questionEl = document.createElement('div');
+        questionEl.classList.add('question');
+        questionEl.textContent = `Q${index + 1}: ${card.question}`;
+        cardDiv.appendChild(questionEl);
+
+        const optionsList = document.createElement('ul');
+        optionsList.classList.add('options');
+        card.options.forEach(option => {
+          if (!option) return;
+          const li = document.createElement('li');
+          li.textContent = option;
+          li.addEventListener('click', () => {
+            [...optionsList.children].forEach(sib => sib.classList.remove('selected'));
+            li.classList.add('selected');
+            card.selected = option;
+          });
+          optionsList.appendChild(li);
+        });
+        cardDiv.appendChild(optionsList);
+
+        const feedbackEl = document.createElement('div');
+        feedbackEl.classList.add('feedback');
+        cardDiv.appendChild(feedbackEl);
+
+        const removeBtn = document.createElement('button');
+        removeBtn.textContent = "Remove";
+        removeBtn.classList.add('remove-btn');
+        removeBtn.addEventListener('click', () => {
+          const realIndex = flashcards.indexOf(card);
+          if (realIndex >= 0) {
+            flashcards.splice(realIndex, 1);
+            saveToLocalStorage();
+            renderFlashcards();
+          }
+        });
+        cardDiv.appendChild(removeBtn);
+
+        container.appendChild(cardDiv);
+      });
+    }
+
+    function runConfetti() {
+      const duration = 2000;
+      const end = Date.now() + duration;
+      (function frame() {
+        confetti({
+          particleCount: 3,
+          startVelocity: 15,
+          spread: 360,
+          ticks: 60,
+          origin: {
+            x: Math.random(),
+            y: Math.random() - 0.1
+          }
+        });
+        if (Date.now() < end) {
+          requestAnimationFrame(frame);
+        }
+      })();
+    }
+
+    function submitTest() {
+      const visibleCards = getVisibleFlashcards();
+      if (!visibleCards.length) {
+        alert("No visible questions to submit!");
+        return;
+      }
+
+      let score = 0;
+      visibleCards.forEach(card => {
+        if (card.selected && card.selected === card.answer) {
+          score++;
+          card.nextDue = Date.now() + 3 * 24 * 60 * 60 * 1000; // correct => 3 days
+        } else {
+          card.nextDue = Date.now() + 1 * 24 * 60 * 60 * 1000; // incorrect => 1 day
+        }
+      });
+      saveToLocalStorage();
+
+      const total = visibleCards.length;
+      const percent = Math.round((score / total) * 100);
+
+      scoreDiv.textContent = `You answered ${score} out of ${total} correctly (${percent}%).`;
+
+      if (percent >= 70) {
+        successSound.play().catch(err => console.log("Success sound error:", err));
+        runConfetti();
+      } else {
+        failSound.play().catch(err => console.log("Fail sound error:", err));
+      }
+
+      const timeTaken = Math.floor((Date.now() - startTime) / 1000);
+      timeTakenDiv.textContent = `Time Taken: ${timeTaken} seconds`;
+
+      if (percent > bestScore) {
+        bestScore = percent;
+        localStorage.setItem('bestScore', bestScore);
+        bestScoreDiv.textContent = `Best Score (All Time): ${bestScore}%`;
+      }
+
+      const flashcardDivs = document.querySelectorAll('.flashcard');
+      flashcardDivs.forEach((div, idx) => {
+        const feedbackEl = div.querySelector('.feedback');
+        const card = visibleCards[idx];
+        if (!card) return;
+        if (card.selected === card.answer) {
+          feedbackEl.textContent = "Correct!";
+          feedbackEl.classList.remove('incorrect');
+          feedbackEl.classList.add('correct');
+        } else {
+          feedbackEl.textContent = `Incorrect. Correct answer: ${card.answer}`;
+          feedbackEl.classList.remove('correct');
+          feedbackEl.classList.add('incorrect');
+        }
+        feedbackEl.style.display = "block";
+      });
+
+      if (reviewMode) {
+        renderFlashcards();
+      }
+    }
+
+    function resetTest() {
+      flashcards.forEach(card => {
+        card.selected = null;
+      });
+      scoreDiv.textContent = 'You answered 0 out of 0 correctly (0%).';
+      timeTakenDiv.textContent = 'Time Taken: 0 seconds';
+      renderFlashcards();
+      startTime = Date.now();
+    }
+
+    function addQuestion() {
+      const questionText = newQuestionEl.value.trim();
+      if (!questionText) {
+        alert("Please enter a question.");
+        return;
+      }
+      const chosenCorrect = document.querySelector('input[name="correctOption"]:checked');
+      const correctIndex = chosenCorrect ? parseInt(chosenCorrect.value, 10) : 0;
+      const newOptions = [];
+      optionEls.forEach(el => {
+        const val = el.value.trim();
+        if (val) newOptions.push(val);
+      });
+      if (newOptions.length === 0) {
+        alert("Please enter at least one option.");
+        return;
+      }
+      if (correctIndex >= newOptions.length) {
+        alert("The correct answer index is beyond the number of options you provided.");
+        return;
+      }
+
+      const correctAnswer = newOptions[correctIndex];
+      const newCard = {
+        question: questionText,
+        options: newOptions,
+        answer: correctAnswer,
+        nextDue: 0
+      };
+      flashcards.push(newCard);
+      saveToLocalStorage();
+
+      newQuestionEl.value = "";
+      optionEls.forEach(el => el.value = "");
+      document.querySelector('input[name="correctOption"][value="0"]').checked = true;
+      renderFlashcards();
+    }
+
+    function removeAllQuestions() {
+      if (!flashcards.length) {
+        alert("No questions to remove.");
+        return;
+      }
+      if (confirm("Are you sure you want to remove ALL questions? This cannot be undone.")) {
+        flashcards = [];
+        saveToLocalStorage();
+        renderFlashcards();
+        alert("All questions have been removed.");
+      }
+    }
+
+    function toggleReviewMode() {
+      reviewMode = !reviewMode;
+      reviewToggleBtn.textContent = `Review Mode: ${reviewMode ? "ON" : "OFF"}`;
+      renderFlashcards();
+    }
+
+    function importFromCSV() {
+      const file = csvFileInput.files[0];
+      if (!file) {
+        alert("Please select a .csv file first!");
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const text = e.target.result;
+        const newCards = parseCsv(text);
+        if (!newCards.length) {
+          alert("No questions found in the CSV, or format not recognized.");
+          return;
+        }
+        flashcards = flashcards.concat(newCards);
+        saveToLocalStorage();
+        renderFlashcards();
+        alert(`Imported ${newCards.length} questions from the CSV file!`);
+      };
+      reader.readAsText(file);
+    }
+
+    function parseCsv(csvText) {
+      const lines = csvText.split(/\r?\n/).map(l => l.trim()).filter(l => l);
+      const result = [];
+      lines.forEach(line => {
+        const parts = line.split(";");
+        if (parts.length < 3) return;
+        const question = parts[0];
+        const correctAnswer = parts[parts.length - 1];
+        const rawOptions = parts.slice(1, parts.length - 1);
+        const newCard = {
+          question,
+          options: rawOptions,
+          answer: correctAnswer,
+          nextDue: 0
+        };
+        result.push(newCard);
+      });
+      return result;
+    }
+
+    removeAllBtn.addEventListener('click', removeAllQuestions);
+    reviewToggleBtn.addEventListener('click', toggleReviewMode);
+    shuffleBtn.addEventListener('click', () => {
+      shuffleArray(flashcards);
+      renderFlashcards();
+    });
+    resetBtn.addEventListener('click', resetTest);
+    submitBtn.addEventListener('click', submitTest);
+    addQuestionBtn.addEventListener('click', addQuestion);
+    csvImportBtn.addEventListener('click', importFromCSV);
+
+    loadFromLocalStorage();
+    renderFlashcards();
+    startTime = Date.now();
+  </script>
+</body>
+</html>

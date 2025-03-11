@@ -1,0 +1,30 @@
+{
+  "name": "flashcard-app",
+  "version": "1.0.0",
+  "description": "A capybara-themed flashcard quiz",
+  "author": "Gary",
+  "main": "main.js",
+  "scripts": {
+    "start": "npx electron .",
+    "build": "electron-builder"
+  },
+  "devDependencies": {
+    "electron": "26.0.0",
+    "electron-builder": "25.1.8"
+  },
+  "build": {
+    "appId": "com.gary.flashcardapp",
+    "productName": "Flashcard App",
+    "directories": {
+      "buildResources": "resources",
+      "output": "dist"
+    },
+    "mac": {
+      "category": "public.app-category.education",
+      "icon": "resources/myicon.icns"
+    },
+    "win": {
+      "icon": "resources/myicon.ico"
+    }
+  }
+}
