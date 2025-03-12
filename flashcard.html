@@ -5,7 +5,7 @@
   <title>Gary's Capybara Flashcard App</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Lobster&display=swap">
   <style>
-    /* (Same CSS as before) */
+    /* Same basic styling as before */
     * {
       box-sizing: border-box;
     }
@@ -47,7 +47,9 @@
       border-radius: 2vw;
       padding: 2vw; margin-bottom: 2vw;
       box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      transition: transform 0.2s; position: relative;
+      transition: transform 0.2s;
+      position: relative;
+      cursor: pointer;
     }
     .flashcard:hover { transform: scale(1.02); }
     .question { font-size: 1.2vw; margin-bottom: 1vw; font-weight: bold; color: #2c2c2c; }
@@ -113,6 +115,20 @@
     .radio-group input[type="radio"] {
       margin-right: 0.5vw; transform: scale(1.5);
     }
+
+    /* ====== Flip Mode styling ====== */
+    /* We'll style .flipcard-front and .flipcard-back for a simple reveal */
+    .flipcard-front, .flipcard-back {
+      display: none; /* hidden by default; we show/hide in JS */
+    }
+    .flipcard-back {
+      margin-top: 1vw;
+      font-style: italic;
+      color: #444;
+      background: #fffde0;
+      border-radius: 1vw;
+      padding: 1vw;
+    }
   </style>
 </head>
 <body>
@@ -127,6 +143,8 @@
     <button id="remove-all-btn">Remove All Questions</button>
     <button id="shuffle-btn">Shuffle Questions</button>
     <button id="reset-btn">Reset Test</button>
+    <!-- NEW: Flip Mode toggle button -->
+    <button id="flip-mode-btn">Flip Mode: OFF</button>
   </div>
 
   <div id="set-management">
@@ -213,8 +231,7 @@
 
   <script>
     /**********************************************************
-      MULTIPLE SETS + NO REVIEW MODE + STYLED UI
-      (Now with no prompt(), using dialogs instead)
+     *  MULTIPLE SETS + Flip Mode
     **********************************************************/
     let flashcardSets = {};
     let currentSetName = null;
@@ -223,11 +240,15 @@
     let startTime;
     let bestScore = 0;
 
+    // FLIP MODE global toggle
+    let flipMode = false;
+
     const container       = document.getElementById('flashcards-container');
     const removeAllBtn    = document.getElementById('remove-all-btn');
     const submitBtn       = document.getElementById('submit-btn');
     const shuffleBtn      = document.getElementById('shuffle-btn');
     const resetBtn        = document.getElementById('reset-btn');
+    const flipModeBtn     = document.getElementById('flip-mode-btn');
     const scoreDiv        = document.getElementById('score');
     const bestScoreDiv    = document.getElementById('best-score');
     const timeTakenDiv    = document.getElementById('time-taken');
@@ -324,7 +345,6 @@
         alert("That set does not exist.");
         return;
       }
-      // confirm(...) might also fail in Electron, but let's keep it for now
       if (confirm(`Are you sure you want to delete the entire set "${chosen}"?`)) {
         delete flashcardSets[chosen];
         saveSetsToLocalStorage();
@@ -353,39 +373,70 @@
         return;
       }
 
+      // If we're in flipMode, we just show front/back. Otherwise, show multiple choice.
       activeFlashcards.forEach((card, index) => {
         const cardDiv = document.createElement('div');
         cardDiv.classList.add('flashcard');
 
-        const questionEl = document.createElement('div');
-        questionEl.classList.add('question');
-        questionEl.textContent = `Q${index + 1}: ${card.question}`;
-        cardDiv.appendChild(questionEl);
+        if (!flipMode) {
+          // Normal multiple-choice rendering
+          const questionEl = document.createElement('div');
+          questionEl.classList.add('question');
+          questionEl.textContent = `Q${index + 1}: ${card.question}`;
+          cardDiv.appendChild(questionEl);
 
-        const optionsList = document.createElement('ul');
-        optionsList.classList.add('options');
-        card.options.forEach(option => {
-          if (!option) return;
-          const li = document.createElement('li');
-          li.textContent = option;
-          li.addEventListener('click', () => {
-            [...optionsList.children].forEach(sib => sib.classList.remove('selected'));
-            li.classList.add('selected');
-            card.selected = option;
+          const optionsList = document.createElement('ul');
+          optionsList.classList.add('options');
+          card.options.forEach(option => {
+            if (!option) return;
+            const li = document.createElement('li');
+            li.textContent = option;
+            li.addEventListener('click', () => {
+              [...optionsList.children].forEach(sib => sib.classList.remove('selected'));
+              li.classList.add('selected');
+              card.selected = option;
+            });
+            optionsList.appendChild(li);
           });
-          optionsList.appendChild(li);
-        });
-        cardDiv.appendChild(optionsList);
+          cardDiv.appendChild(optionsList);
 
-        const feedbackEl = document.createElement('div');
-        feedbackEl.classList.add('feedback');
-        cardDiv.appendChild(feedbackEl);
+          const feedbackEl = document.createElement('div');
+          feedbackEl.classList.add('feedback');
+          cardDiv.appendChild(feedbackEl);
 
-        // Remove button
+        } else {
+          // Flip Mode rendering (front/back)
+          const frontDiv = document.createElement('div');
+          frontDiv.classList.add('flipcard-front');
+          frontDiv.textContent = `Q${index + 1}: ${card.question}`;
+          // Show front by default
+          frontDiv.style.display = 'block';
+
+          const backDiv = document.createElement('div');
+          backDiv.classList.add('flipcard-back');
+          backDiv.textContent = `Answer: ${card.answer}`;
+
+          // Clicking the card toggles front/back
+          cardDiv.addEventListener('click', () => {
+            if (frontDiv.style.display === 'block') {
+              frontDiv.style.display = 'none';
+              backDiv.style.display = 'block';
+            } else {
+              frontDiv.style.display = 'block';
+              backDiv.style.display = 'none';
+            }
+          });
+
+          cardDiv.appendChild(frontDiv);
+          cardDiv.appendChild(backDiv);
+        }
+
+        // Remove button (works in either mode)
         const removeBtn = document.createElement('button');
         removeBtn.textContent = "Remove";
         removeBtn.classList.add('remove-btn');
-        removeBtn.addEventListener('click', () => {
+        removeBtn.addEventListener('click', (e) => {
+          e.stopPropagation(); // So we don't trigger flip on remove
           const realIndex = activeFlashcards.indexOf(card);
           if (realIndex >= 0) {
             activeFlashcards.splice(realIndex, 1);
@@ -533,7 +584,6 @@
         alert("No questions to remove.");
         return;
       }
-      // confirm might also not work in Electron, but let's keep it as is
       if (confirm("Remove all currently loaded questions (set data remains)?")) {
         activeFlashcards = [];
         renderFlashcards();
@@ -542,10 +592,9 @@
     }
 
     /**********************************************************
-     * Replacing prompt() with a dialog for "Save as New Set"
+     * "Save as New Set" (replaces prompt)
      **********************************************************/
     function showNewSetDialog() {
-      // Clear old input, show the dialog
       newSetNameInput.value = "";
       newSetDialog.style.display = "block";
     }
@@ -565,14 +614,11 @@
         alert(`A set named "${newName}" already exists. Please choose another name.`);
         return;
       }
-      // Create a deep copy
       flashcardSets[newName] = activeFlashcards.map(card => structuredClone(card));
       saveSetsToLocalStorage();
       populateSetDropdown();
       alert(`Saved ${activeFlashcards.length} questions as new set "${newName}".`);
     }
-
-    // Hook up the dialog buttons
     newSetNameConfirmBtn.addEventListener('click', () => {
       const newName = newSetNameInput.value.trim();
       hideNewSetDialog();
@@ -584,7 +630,7 @@
     });
 
     /**********************************************************
-     * Replacing prompt() with a dialog for CSV import
+     * CSV Import (replaces prompt)
      **********************************************************/
     function showImportCSVDialog() {
       importSetNameInput.value = "";
@@ -638,8 +684,6 @@
       };
       reader.readAsText(file);
     }
-
-    // Hook up the dialog buttons for CSV
     importSetNameConfirmBtn.addEventListener('click', () => {
       const setName = importSetNameInput.value.trim();
       hideImportCSVDialog();
@@ -699,6 +743,13 @@
     deleteSetBtn.addEventListener('click', deleteSelectedSet);
     saveCurrentAsSetBtn.addEventListener('click', showNewSetDialog);
     resetFloatingBtn.addEventListener('click', resetTest);
+
+    // Flip Mode toggle
+    flipModeBtn.addEventListener('click', () => {
+      flipMode = !flipMode;
+      flipModeBtn.textContent = flipMode ? "Flip Mode: ON" : "Flip Mode: OFF";
+      renderFlashcards();
+    });
 
     initApp();
   </script>
