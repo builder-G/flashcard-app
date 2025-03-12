@@ -28,7 +28,7 @@
       "category": "public.app-category.education",
       "icon": "resources/myicon.icns",
      "target": "dmg",
-     "universalApp": true
+     "arch": "universal"
     },
     "win": {
       "icon": "resources/myicon.ico",
