@@ -3,25 +3,26 @@ name: Build macOS Electron App
 on: [push, pull_request]
 
 jobs:
-  build-mac:
+  build:
     runs-on: macos-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
+      - name: Checkout Repository
+        uses: actions/checkout@v3
 
-      - name: Set up Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v2
         with:
           node-version: 16
 
-      - name: Install dependencies
+      - name: Install Dependencies
         run: npm install
 
-      - name: Build Electron App for macOS
+      - name: Build the macOS App
         run: npm run build
 
       - name: Upload macOS Build
-        with: zip -r mac-build.zip dist && mv mac-build.zip $GITHUB_WORKSPACE/
+        uses: actions/upload-artifact@v3
+        with:
           name: macOS-DMG
           path: dist/*.dmg
