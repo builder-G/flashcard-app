@@ -22,7 +22,6 @@ jobs:
         run: npm run build
 
       - name: Upload macOS Build
-        uses: actions/upload-artifact@v3
-        with:
+        with: zip -r mac-build.zip dist && mv mac-build.zip $GITHUB_WORKSPACE/
           name: macOS-DMG
           path: dist/*.dmg
