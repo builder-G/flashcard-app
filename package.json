@@ -5,9 +5,16 @@
   "author": "Gary",
   "main": "main.js",
   "scripts": {
-    "build:mac": "electron-builder --mac dmg --arch=x64",
+    // Build a macOS x64 .dmg
+    "build:mac-x64": "electron-builder --mac dmg --arch=x64",
+
+    // Build a macOS arm64 .dmg
+    "build:mac-arm64": "electron-builder --mac dmg --arch=arm64",
+
+    // Build a Windows .exe
     "build:win": "electron-builder --win",
-    "build:all": "electron-builder --mac dmg --arch=x64 --win",
+
+    // Build & publish the final artifact to GitHub
     "publish": "electron-builder --publish always"
   },
   "dependencies": {
@@ -25,6 +32,8 @@
       "output": "dist"
     },
     "mac": {
+      // We'll build x64 and arm64 separately,
+      // then merge them via 'electron-builder merge'
       "category": "public.app-category.education",
       "icon": "resources/myicon.icns",
       "target": "dmg"
