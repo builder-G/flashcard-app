@@ -27,7 +27,7 @@
     "mac": {
       "category": "public.app-category.education",
       "icon": "resources/myicon.icns",
-      "target": "universal"
+      "target": ["universal"]
     },
     "win": {
       "icon": "resources/myicon.ico",
