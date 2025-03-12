@@ -14,20 +14,18 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 18  # avoid EBADENGINE warnings
 
       - name: Install dependencies
         run: npm install
 
       - name: Build x64
-        # If you prefer using your npm script, do: run: npm run build:mac
-        # But here's a direct electron-builder call:
-        run: electron-builder --mac dmg --arch=x64
+        run: npm run build:mac-x64
 
       - name: Upload x64 artifact
         uses: actions/upload-artifact@v4
         with:
-          name: x64-dmg
+          name: mac-x64-dmg
           path: dist/*.dmg
 
   build-mac-arm64:
@@ -39,18 +37,18 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 18
 
       - name: Install dependencies
         run: npm install
 
       - name: Build arm64
-        run: electron-builder --mac dmg --arch=arm64
+        run: npm run build:mac-arm64
 
       - name: Upload arm64 artifact
         uses: actions/upload-artifact@v4
         with:
-          name: arm64-dmg
+          name: mac-arm64-dmg
           path: dist/*.dmg
 
   merge-universal:
@@ -60,33 +58,39 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v3
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
       - name: Install dependencies
         run: npm install
 
       - name: Download x64 artifact
         uses: actions/download-artifact@v4
         with:
-          name: x64-dmg
+          name: mac-x64-dmg
           path: dist/
 
       - name: Download arm64 artifact
         uses: actions/download-artifact@v4
         with:
-          name: arm64-dmg
+          name: mac-arm64-dmg
           path: dist/
 
       - name: List DMG files
         run: ls dist
 
       - name: Merge into universal dmg
-        # Adjust the filenames to match exactly what you see in 'ls dist'
+        # Adjust the filenames to match the actual names in your dist folder
         run: |
-          electron-builder merge \
+          npx electron-builder merge \
             --output dist/Flashcard-App-universal.dmg \
             "dist/Flashcard App-1.0.1.dmg" \
             "dist/Flashcard App-1.0.1-arm64.dmg"
 
       - name: Publish universal build
+        # This calls your "publish" script => electron-builder --publish always
         run: npm run publish
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
@@ -100,14 +104,13 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 18
 
       - name: Install dependencies
         run: npm install
 
       - name: Build Windows app
-        # If you have a script: run: npm run build:win
-        run: electron-builder --win
+        run: npm run build:win
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
