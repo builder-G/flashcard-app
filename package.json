@@ -5,9 +5,9 @@
   "author": "Gary",
   "main": "main.js",
   "scripts": {
-    "build:mac-x64": "electron-builder --mac dmg --x64 --publish never",
-    "build:mac-arm64": "electron-builder --mac dmg --arm64 --publish never",
-    "build:win": "electron-builder --win",
+    "build:mac-x64": "electron-builder --mac dmg --x64 --publish always",
+    "build:mac-arm64": "electron-builder --mac dmg --arm64 --publish always",
+    "build:win": "electron-builder --win --publish always",
     "publish": "electron-builder --publish always"
   },
   "dependencies": {
