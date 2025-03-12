@@ -5,12 +5,8 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build:
-    strategy:
-      matrix:
-        os: [ macos-latest, windows-latest ]
-    runs-on: ${{ matrix.os }}
-
+  build-mac-x64:
+    runs-on: macos-latest
     steps:
       - name: Check out repository
         uses: actions/checkout@v3
@@ -23,26 +19,93 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      # Build differently on mac vs windows, forcing Bash shell
-      - name: Build the app
+      - name: Build x64
+        run: electron-builder --mac dmg --arch=x64
+
+      - name: Upload x64 artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: x64-dmg
+          path: dist/*.dmg
+
+  build-mac-arm64:
+    runs-on: macos-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build arm64
+        run: electron-builder --mac dmg --arch=arm64
+
+      - name: Upload arm64 artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: arm64-dmg
+          path: dist/*.dmg
+
+  merge-universal:
+    runs-on: macos-latest
+    needs: [ build-mac-x64, build-mac-arm64 ]
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+
+      - name: Download x64 artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: x64-dmg
+
+      - name: Download arm64 artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: arm64-dmg
+
+      - name: Merge into universal dmg
         run: |
-          if [ "${{ matrix.os }}" = "macos-latest" ]; then
-            npm run build:mac
-          else
-            npm run build:win
-          fi
-        shell: bash
+          electron-builder merge \
+            --output dist/Flashcard-App-universal.dmg \
+            x64-dmg-file-name.dmg \
+            arm64-dmg-file-name.dmg
+
+      - name: Publish universal build
+        run: npm run publish
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
-      - name: Upload artifacts
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build Windows app
+        run: npm run build:win
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+
+      - name: Upload Windows artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.os }}-artifacts
+          name: windows-artifacts
           path: dist/*
 
-  
-      - name: Publish to GitHub Releases
+      - name: Publish Windows build
         run: npm run publish
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
