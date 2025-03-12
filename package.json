@@ -9,6 +9,9 @@
     "build:win": "electron-builder --win",
     "build:all": "electron-builder --mac --win"
   },
+  "dependencies": {
+    "electron-updater": "6.3.9"
+  },
   "devDependencies": {
     "electron": "26.0.0",
     "electron-builder": "25.1.8"
