@@ -5,12 +5,11 @@
   "author": "Gary",
   "main": "main.js",
   "scripts": {
-  "build:mac": "npx electron-builder --mac",
-  "build:win": "npx electron-builder --win",
-  "build:all": "npx electron-builder --mac --win",
-  "publish": "npx electron-builder --publish always"
-}
-
+    "build:mac": "npx electron-builder --mac",
+    "build:win": "npx electron-builder --win",
+    "build:all": "npx electron-builder --mac --win",
+    "publish": "npx electron-builder --publish always"
+  },
   "dependencies": {
     "electron-updater": "6.3.9"
   },
