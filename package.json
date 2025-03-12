@@ -5,10 +5,10 @@
   "author": "Gary",
   "main": "main.js",
   "scripts": {
-    "build:mac": "npx electron-builder --mac dmg --arch=x64",
-    "build:win": "npx electron-builder --win",
-    "build:all": "npx electron-builder --mac dmg --arch=x64 --win",
-    "publish": "npx electron-builder --publish always"
+    "build:mac": "electron-builder --mac dmg --arch=x64",
+    "build:win": "electron-builder --win",
+    "build:all": "electron-builder --mac dmg --arch=x64 --win",
+    "publish": "electron-builder --publish always"
   },
   "dependencies": {
     "electron-updater": "6.3.9"
