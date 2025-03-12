@@ -28,6 +28,11 @@ jobs:
           name: mac-x64-dmg
           path: dist/*.dmg
 
+      - name: Publish Mac (Intel) build
+        run: npm run publish
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+
   build-mac-arm64:
     runs-on: macos-latest
     steps:
@@ -50,50 +55,12 @@ jobs:
         with:
           name: mac-arm64-dmg
           path: dist/*.dmg
-
-  merge-universal:
-    runs-on: macos-latest
-    needs: [ build-mac-x64, build-mac-arm64 ]
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v3
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Download x64 artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: mac-x64-dmg
-          path: dist/
-
-      - name: Download arm64 artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: mac-arm64-dmg
-          path: dist/
-
-      - name: List DMG files
-        run: ls dist
-
-      - name: Merge into universal dmg
-        # Adjust the filenames to match the actual names in your dist folder
-        run: |
-          npx electron-builder merge \
-            --output dist/Flashcard-App-universal.dmg \
-            "dist/Flashcard App-1.0.1.dmg" \
-            "dist/Flashcard App-1.0.1-arm64.dmg"
-
-      - name: Publish universal build
-        # This calls your "publish" script => electron-builder --publish always
+      
+      - name: Publish Mac (Silicone) build
         run: npm run publish
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
+ 
 
   build-windows:
     runs-on: windows-latest
