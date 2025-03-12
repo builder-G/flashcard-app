@@ -14,22 +14,13 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 18  # avoid EBADENGINE warnings
+          node-version: 18
 
       - name: Install dependencies
         run: npm install
 
-      - name: Build x64
+      - name: Build & Publish macOS x64
         run: npm run build:mac-x64
-
-      - name: Upload x64 artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: mac-x64-dmg
-          path: dist/*.dmg
-
-      - name: Publish Mac (Intel) build
-        run: npm run publish
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
@@ -47,20 +38,10 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Build arm64
+      - name: Build & Publish macOS arm64
         run: npm run build:mac-arm64
-
-      - name: Upload arm64 artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: mac-arm64-dmg
-          path: dist/*.dmg
-      
-      - name: Publish Mac (Silicone) build
-        run: npm run publish
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
- 
 
   build-windows:
     runs-on: windows-latest
@@ -76,18 +57,7 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Build Windows app
+      - name: Build & Publish Windows app
         run: npm run build:win
-        env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
-
-      - name: Upload Windows artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: windows-artifacts
-          path: dist/*
-
-      - name: Publish Windows build
-        run: npm run publish
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
