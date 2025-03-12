@@ -1,5 +1,5 @@
 name: Build Electron App for Windows & macOS
-
+run: npm install
 on:
   push:
     branches: [ "main" ]
