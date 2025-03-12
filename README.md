@@ -22,4 +22,5 @@ You have two options for the number of possible answers:
 ### **Example: 4 Options + 1 Correct**
 ```csv
 What is this author's favorite color?; Blue; Green; Brown; Black; Blue
+```
 In the above example, Blue would be the right answer. Happy studying!
