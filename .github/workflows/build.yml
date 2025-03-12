@@ -1,5 +1,5 @@
 name: Build Electron App for Windows & macOS
-run: npm install
+
 on:
   push:
     branches: [ "main" ]
@@ -20,6 +20,8 @@ jobs:
         run: npm install
 
       - name: Build x64
+        # If you prefer using your npm script, do: run: npm run build:mac
+        # But here's a direct electron-builder call:
         run: electron-builder --mac dmg --arch=x64
 
       - name: Upload x64 artifact
@@ -58,22 +60,31 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v3
 
+      - name: Install dependencies
+        run: npm install
+
       - name: Download x64 artifact
         uses: actions/download-artifact@v4
         with:
           name: x64-dmg
+          path: dist/
 
       - name: Download arm64 artifact
         uses: actions/download-artifact@v4
         with:
           name: arm64-dmg
+          path: dist/
+
+      - name: List DMG files
+        run: ls dist
 
       - name: Merge into universal dmg
+        # Adjust the filenames to match exactly what you see in 'ls dist'
         run: |
           electron-builder merge \
             --output dist/Flashcard-App-universal.dmg \
-            x64-dmg-file-name.dmg \
-            arm64-dmg-file-name.dmg
+            "dist/Flashcard App-1.0.1.dmg" \
+            "dist/Flashcard App-1.0.1-arm64.dmg"
 
       - name: Publish universal build
         run: npm run publish
@@ -95,7 +106,8 @@ jobs:
         run: npm install
 
       - name: Build Windows app
-        run: npm run build:win
+        # If you have a script: run: npm run build:win
+        run: electron-builder --win
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
