@@ -1,6 +1,6 @@
 {
   "name": "flashcard-app",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A capybara-themed flashcard quiz",
   "author": "Gary",
   "main": "main.js",
@@ -27,7 +27,7 @@
     "mac": {
       "category": "public.app-category.education",
       "icon": "resources/myicon.icns",
-      "target": "dmg"
+      "target": "universal"
     },
     "win": {
       "icon": "resources/myicon.ico",
