@@ -1,6 +1,6 @@
 {
   "name": "flashcard-app",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A capybara-themed flashcard quiz",
   "author": "Gary",
   "main": "main.js",
