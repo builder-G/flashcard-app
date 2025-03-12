@@ -21,18 +21,15 @@
       "buildResources": "resources",
       "output": "dist"
     },
-    /* macOS Build Settings */
     "mac": {
       "category": "public.app-category.education",
       "icon": "resources/myicon.icns",
       "target": "dmg"
     },
-    /* Windows Build Settings */
     "win": {
       "icon": "resources/myicon.ico",
       "target": "nsis"
     },
-    /* Auto-publish to GitHub Releases */
     "publish": [
       {
         "provider": "github",
