@@ -6,7 +6,9 @@
   "main": "main.js",
   "scripts": {
     "start": "npx electron .",
-    "build": "electron-builder"
+    "build:mac": "electron-builder --mac",
+    "build:win": "electron-builder --win",
+    "build:all": "electron-builder --mac --win"
   },
   "devDependencies": {
     "electron": "26.0.0",
@@ -19,12 +21,24 @@
       "buildResources": "resources",
       "output": "dist"
     },
+    /* macOS Build Settings */
     "mac": {
       "category": "public.app-category.education",
-      "icon": "resources/myicon.icns"
+      "icon": "resources/myicon.icns",
+      "target": "dmg"
     },
+    /* Windows Build Settings */
     "win": {
-      "icon": "resources/myicon.ico"
-    }
+      "icon": "resources/myicon.ico",
+      "target": "nsis"
+    },
+    /* Auto-publish to GitHub Releases */
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "builder-G",
+        "repo": "flashcard-app"
+      }
+    ]
   }
 }
