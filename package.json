@@ -37,7 +37,7 @@
       {
         "provider": "github",
         "owner": "builder-G",
-        "repo": "flashcard-app"
+        "repo": "flashcard-app",
         "releaseType": "release"
       }
     ]
