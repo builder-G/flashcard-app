@@ -3,260 +3,132 @@
 <head>
   <meta charset="UTF-8">
   <title>Gary's Capybara Flashcard App</title>
-
-  <!-- Fonts: Montserrat (body) + Lobster (heading) -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Lobster&display=swap">
-
   <style>
-    /* 
-      1) Unified color palette: warm orange/brown (#E6A15E) 
-      2) Lightened background with overlay 
-      3) Larger border-radius & softer shadows 
-      4) Consistent button styling 
-      5) Subtle hover transitions 
-      6) Fancy heading (Lobster) 
-    */
-
-    /* ============ Body & Background ============ */
+    /* (Same CSS as before) */
     * {
       box-sizing: border-box;
     }
     body {
-      margin: 0;
-      padding: 0;
-      /* Use Montserrat for main text */
+      margin: 0; padding: 0;
       font-family: 'Montserrat', sans-serif;
       color: #333;
       min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-
-      /* Capybara image with a semi-transparent white overlay for clarity */
-      background: 
-        linear-gradient(rgba(255,255,255,0.3), rgba(255,255,255,0.3)), 
+      display: flex; flex-direction: column; align-items: center;
+      background:
+        linear-gradient(rgba(255,255,255,0.3), rgba(255,255,255,0.3)),
         url('capybara-theme.png') no-repeat center center fixed;
       background-size: cover;
     }
-
-    /* ============ Heading ============ */
     h1 {
-      margin-top: 2vw;
-      margin-bottom: 1vw;
-      font-family: 'Lobster', cursive; /* fancy cursive font */
-      color: #8B4513; /* warm brown text */
+      margin-top: 2vw; margin-bottom: 1vw;
+      font-family: 'Lobster', cursive;
+      color: #8B4513;
       text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
       background: rgba(255,255,255,0.6);
-      padding: 1vw 2vw;
-      border-radius: 1vw;
-      font-size: 2.5vw;
+      padding: 1vw 2vw; border-radius: 1vw; font-size: 2.5vw;
     }
-
-    /* ============ Containers ============ */
     .controls,
     #csv-import,
     #question-form,
     #set-management {
-      width: 90%;
-      max-width: 900px;
+      width: 90%; max-width: 900px;
       background: rgba(255,255,255,0.7);
-      border-radius: 2vw; /* bigger rounding */
-      padding: 2vw;
-      margin: 1vw 0;
-      /* softer shadow */
+      border-radius: 2vw;
+      padding: 2vw; margin: 1vw 0;
       box-shadow: 0 4px 12px rgba(0,0,0,0.15);
       position: relative;
     }
-
     #flashcards-container {
-      width: 90%;
-      max-width: 900px;
-      margin: 1vw 0;
+      width: 90%; max-width: 900px; margin: 1vw 0;
     }
-
-    /* ============ Flashcards ============ */
     .flashcard {
       background: rgba(255,255,255,0.8);
       border-radius: 2vw;
-      padding: 2vw;
-      margin-bottom: 2vw;
+      padding: 2vw; margin-bottom: 2vw;
       box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      transition: transform 0.2s;
-      position: relative;
+      transition: transform 0.2s; position: relative;
     }
-    .flashcard:hover {
-      transform: scale(1.02);
-    }
-    .question {
-      font-size: 1.2vw;
-      margin-bottom: 1vw;
-      font-weight: bold;
-      color: #2c2c2c;
-    }
-    .options {
-      list-style: none;
-      padding: 0;
-    }
+    .flashcard:hover { transform: scale(1.02); }
+    .question { font-size: 1.2vw; margin-bottom: 1vw; font-weight: bold; color: #2c2c2c; }
+    .options { list-style: none; padding: 0; }
     .options li {
-      padding: 1vw 1.5vw;
-      margin: 1vw 0;
-      background: #f1f1f1;
-      border-radius: 0.5vw;
-      cursor: pointer;
-      transition: background 0.2s, color 0.2s;
-      font-size: 1vw;
+      padding: 1vw 1.5vw; margin: 1vw 0;
+      background: #f1f1f1; border-radius: 0.5vw; cursor: pointer;
+      transition: background 0.2s, color 0.2s; font-size: 1vw;
     }
-    .options li:hover {
-      background: #e0e0e0;
-    }
-    .options li.selected {
-      background: #5563DE;
-      color: #fff;
-    }
+    .options li:hover { background: #e0e0e0; }
+    .options li.selected { background: #5563DE; color: #fff; }
     .feedback {
-      font-size: 1vw;
-      font-weight: bold;
-      text-align: center;
-      margin-top: 1vw;
-      padding: 1vw;
-      border-radius: 0.8vw;
-      display: none;
+      font-size: 1vw; font-weight: bold; text-align: center;
+      margin-top: 1vw; padding: 1vw; border-radius: 0.8vw; display: none;
     }
-    .feedback.correct {
-      background: #4CAF50;
-      color: #fff;
-    }
-    .feedback.incorrect {
-      background: #F44336;
-      color: #fff;
-    }
+    .feedback.correct { background: #4CAF50; color: #fff; }
+    .feedback.incorrect { background: #F44336; color: #fff; }
     .remove-btn {
-      position: absolute;
-      bottom: 1vw;
-      right: 1vw;
-      background: #f44336;
-      font-size: 1vw;
-      padding: 0.5vw 1vw;
-      border: none;
-      border-radius: 0.5vw;
-      cursor: pointer;
+      position: absolute; bottom: 1vw; right: 1vw;
+      background: #f44336; font-size: 1vw; padding: 0.5vw 1vw;
+      border: none; border-radius: 0.5vw; cursor: pointer;
       transition: background 0.3s;
     }
-    .remove-btn:hover {
-      background: #c0392b;
-    }
-
-    /* ============ Buttons ============ */
+    .remove-btn:hover { background: #c0392b; }
     button {
-      font-family: 'Montserrat', sans-serif;
-      font-weight: 500;
-      margin: 0.5vw;
-      padding: 1vw 1.5vw;
-      font-size: 1vw;
-      background: #E6A15E; /* unify color */
-      color: #fff;
-      border: none;
-      border-radius: 1vw;
-      cursor: pointer;
-      /* subtle hover transitions */
-      transition: background 0.3s, transform 0.2s;
+      font-family: 'Montserrat', sans-serif; font-weight: 500;
+      margin: 0.5vw; padding: 1vw 1.5vw; font-size: 1vw;
+      background: #E6A15E; color: #fff; border: none; border-radius: 1vw;
+      cursor: pointer; transition: background 0.3s, transform 0.2s;
     }
-    button:hover {
-      background: #d89054;
-      transform: translateY(-2px);
-    }
-
-    /* ============ Submit & Reset (floating) ============ */
+    button:hover { background: #d89054; transform: translateY(-2px); }
     #submit-btn {
-      position: fixed;
-      left: 2vw;
-      top: 50vh;
-      transform: translateY(-50%);
-      z-index: 999;
-      font-size: 2vw;
-      padding: 1.2vw 2vw;
+      position: fixed; left: 2vw; top: 50vh; transform: translateY(-50%);
+      z-index: 999; font-size: 2vw; padding: 1.2vw 2vw;
       box-shadow: 0.4vw 0.4vw 0.8vw rgba(0,0,0,0.3);
     }
     #reset-floating-btn {
-      display: none;
-      position: fixed;
-      left: 2vw;
-      top: 60vh;
-      transform: translateY(-50%);
-      z-index: 999;
-      font-size: 2vw;
-      padding: 1.2vw 2vw;
+      display: none; position: fixed; left: 2vw; top: 60vh; transform: translateY(-50%);
+      z-index: 999; font-size: 2vw; padding: 1.2vw 2vw;
       box-shadow: 0.4vw 0.4vw 0.8vw rgba(0,0,0,0.3);
     }
-
-    /* ============ Score Container (top-right) ============ */
     #score-container {
-      position: fixed;
-      top: 1vw;
-      right: 1vw;
-      background: rgba(255,255,255,0.7);
-      border-radius: 1vw;
-      padding: 1vw 1.5vw;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-      text-align: right;
-      z-index: 999;
-      min-width: 10vw;
-      transform: scale(0.7);
-      transform-origin: top right;
+      position: fixed; top: 1vw; right: 1vw;
+      background: rgba(255,255,255,0.7); border-radius: 1vw;
+      padding: 1vw 1.5vw; box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      text-align: right; z-index: 999; min-width: 10vw;
+      transform: scale(0.7); transform-origin: top right;
     }
     #score-container p {
-      margin: 0.5vw 0;
-      font-weight: bold;
-      color: #2c2c2c;
-      font-size: 1.2vw;
+      margin: 0.5vw 0; font-weight: bold; color: #2c2c2c; font-size: 1.2vw;
     }
-
-    /* ============ Labels, Inputs ============ */
     label {
-      display: block;
-      margin-bottom: 0.5vw;
-      font-weight: bold;
-      color: #2c2c2c;
-      font-size: 1vw;
+      display: block; margin-bottom: 0.5vw; font-weight: bold;
+      color: #2c2c2c; font-size: 1vw;
     }
     input[type="text"] {
-      width: 100%;
-      padding: 0.8vw;
-      margin-bottom: 0.5vw;
-      border-radius: 0.5vw;
-      border: 0.1vw solid #ccc;
-      font-size: 1vw;
+      width: 100%; padding: 0.8vw; margin-bottom: 0.5vw;
+      border-radius: 0.5vw; border: 0.1vw solid #ccc; font-size: 1vw;
     }
     .radio-group {
-      display: flex;
-      align-items: center;
-      margin: 0.5vw 0;
+      display: flex; align-items: center; margin: 0.5vw 0;
     }
     .radio-group input[type="radio"] {
-      margin-right: 0.5vw;
-      transform: scale(1.5);
+      margin-right: 0.5vw; transform: scale(1.5);
     }
   </style>
 </head>
 <body>
-
   <h1>Gary's Capybara Flashcard App</h1>
-
-  <!-- Score Info in top-right corner -->
   <div id="score-container">
     <p id="score">You answered 0 out of 0 correctly (0%).</p>
     <p id="best-score">Best Score (All Time): 0%</p>
     <p id="time-taken">Time Taken: 0 seconds</p>
   </div>
 
-  <!-- Controls Section -->
   <div class="controls">
     <button id="remove-all-btn">Remove All Questions</button>
     <button id="shuffle-btn">Shuffle Questions</button>
     <button id="reset-btn">Reset Test</button>
   </div>
 
-  <!-- Manage Multiple Sets -->
   <div id="set-management">
     <h2>Manage Question Sets</h2>
     <label for="set-select">Select a Question Set:</label>
@@ -264,13 +136,8 @@
     <button id="load-set-btn">Load Set</button>
     <button id="save-current-as-set-btn">Save Current as New Set</button>
     <button id="delete-set-btn">Delete Set</button>
-
-
-    <!-- If you have a remove-set feature, add it here -->
-    <!-- <button id="remove-set-btn">Remove Set</button> -->
   </div>
 
-  <!-- CSV Import Section -->
   <div id="csv-import">
     <h2>Select a CSV File, Then Add CSV to New Set</h2>
     <p><em>Rows can have 6 columns (4 options) or 7 columns (5 options) + final column for correct answer.</em></p>
@@ -278,7 +145,6 @@
     <button id="csv-import-btn">Add CSV to New Set</button>
   </div>
 
-  <!-- ADD NEW QUESTION FORM -->
   <div id="question-form">
     <h2>Add New Question</h2>
     <div>
@@ -308,35 +174,49 @@
     </div>
     <button id="add-question-btn">Add Question</button>
   </div>
-  
-  <!-- The main container for flashcards -->
-  <div id="flashcards-container"></div>
-  
-  <!-- Submit button (scaled via VW, fixed on the left side) -->
-  <button id="submit-btn">Submit Test</button>
 
-  <!-- Reset button floating below, hidden initially -->
+  <div id="flashcards-container"></div>
+
+  <button id="submit-btn">Submit Test</button>
   <button id="reset-floating-btn" style="display:none;">Reset Test</button>
 
-  <!-- Audio elements for success/fail sounds (optional) -->
   <audio id="success-sound">
     <source src="success.mp3" type="audio/mpeg">
-    Your browser does not support the audio element or success.mp3 is missing.
   </audio>
   <audio id="fail-sound">
     <source src="fail.mp3" type="audio/mpeg">
-    Your browser does not support the audio element or fail.mp3 is missing.
   </audio>
 
-  <!-- Confetti library (CDN) -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+
+  <!-- 
+       NEW DIALOGS (replaces prompt) 
+       We'll show/hide these programmatically 
+  -->
+  <div id="newSetDialog" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
+       background-color:white; padding:20px; border:2px solid #ccc; z-index:9999;">
+    <label for="newSetNameInput">New Set Name:</label>
+    <input type="text" id="newSetNameInput" />
+    <br>
+    <button id="newSetNameConfirmBtn">OK</button>
+    <button id="newSetNameCancelBtn">Cancel</button>
+  </div>
+
+  <div id="importCSVDialog" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
+       background-color:white; padding:20px; border:2px solid #ccc; z-index:9999;">
+    <label for="importSetNameInput">Set Name for CSV:</label>
+    <input type="text" id="importSetNameInput" />
+    <br>
+    <button id="importSetNameConfirmBtn">OK</button>
+    <button id="importSetNameCancelBtn">Cancel</button>
+  </div>
 
   <script>
     /**********************************************************
       MULTIPLE SETS + NO REVIEW MODE + STYLED UI
-      (RemoveSet logic optional; remove references if not used)
+      (Now with no prompt(), using dialogs instead)
     **********************************************************/
-    let flashcardSets = {};   
+    let flashcardSets = {};
     let currentSetName = null;
     let activeFlashcards = [];
 
@@ -373,11 +253,22 @@
     // Set Management
     const setSelect       = document.getElementById('set-select');
     const loadSetBtn      = document.getElementById('load-set-btn');
-    // If you have remove-set, you'd do:
-    // const removeSetBtn    = document.getElementById('remove-set-btn');
+    const deleteSetBtn    = document.getElementById('delete-set-btn');
+    const saveCurrentAsSetBtn = document.getElementById('save-current-as-set-btn');
+
+    // Our new "dialogs"
+    const newSetDialog              = document.getElementById('newSetDialog');
+    const newSetNameInput           = document.getElementById('newSetNameInput');
+    const newSetNameConfirmBtn      = document.getElementById('newSetNameConfirmBtn');
+    const newSetNameCancelBtn       = document.getElementById('newSetNameCancelBtn');
+
+    const importCSVDialog           = document.getElementById('importCSVDialog');
+    const importSetNameInput        = document.getElementById('importSetNameInput');
+    const importSetNameConfirmBtn   = document.getElementById('importSetNameConfirmBtn');
+    const importSetNameCancelBtn    = document.getElementById('importSetNameCancelBtn');
 
     /**********************************************************
-     * Local Storage for sets
+     * Local Storage
      **********************************************************/
     function loadSetsFromLocalStorage() {
       const saved = localStorage.getItem('flashcardSets');
@@ -402,37 +293,6 @@
         };
       }
     }
-    function saveCurrentAsNewSet() {
-  // If there are no active flashcards, nothing to save
-  if (!activeFlashcards.length) {
-    alert("No questions to save!");
-    return;
-  }
-
-  // Prompt the user for a new set name
-  const newName = prompt("Enter a new set name for these questions:");
-  if (!newName) {
-    alert("Save canceled, no name provided.");
-    return;
-  }
-
-  // Check if a set with that name already exists
-  if (flashcardSets[newName]) {
-    alert(`A set named "${newName}" already exists. Please choose another name.`);
-    return;
-  }
-
-  // Create a deep copy of the activeFlashcards for the new set
-  flashcardSets[newName] = activeFlashcards.map(card => structuredClone(card));
-
-  // Persist to local storage
-  saveSetsToLocalStorage();
-
-  // Refresh the dropdown to include the new set
-  populateSetDropdown();
-
-  alert(`Saved ${activeFlashcards.length} questions as new set "${newName}".`);
-}
 
     function saveSetsToLocalStorage() {
       localStorage.setItem('flashcardSets', JSON.stringify(flashcardSets));
@@ -450,32 +310,33 @@
         setSelect.appendChild(opt);
       }
     }
-function deleteSelectedSet() {
-  const chosen = setSelect.value; // the <select> element's value
-  if (!chosen) {
-    alert("No set selected to delete!");
-    return;
-  }
-  if (!flashcardSets[chosen]) {
-    alert("That set does not exist.");
-    return;
-  }
 
-  if (confirm(`Are you sure you want to delete the entire set "${chosen}"? This cannot be undone.`)) {
-    // Remove it from flashcardSets
-    delete flashcardSets[chosen];
-    saveSetsToLocalStorage();
-    populateSetDropdown();
-
-    // If the deleted set was active, clear activeFlashcards
-    if (currentSetName === chosen) {
-      currentSetName = null;
-      activeFlashcards = [];
-      renderFlashcards();
+    /**********************************************************
+     * Delete a set
+     **********************************************************/
+    function deleteSelectedSet() {
+      const chosen = setSelect.value;
+      if (!chosen) {
+        alert("No set selected to delete!");
+        return;
+      }
+      if (!flashcardSets[chosen]) {
+        alert("That set does not exist.");
+        return;
+      }
+      // confirm(...) might also fail in Electron, but let's keep it for now
+      if (confirm(`Are you sure you want to delete the entire set "${chosen}"?`)) {
+        delete flashcardSets[chosen];
+        saveSetsToLocalStorage();
+        populateSetDropdown();
+        if (currentSetName === chosen) {
+          currentSetName = null;
+          activeFlashcards = [];
+          renderFlashcards();
+        }
+        alert(`Set "${chosen}" has been deleted.`);
+      }
     }
-    alert(`Set "${chosen}" has been deleted.`);
-  }
-}
 
     /**********************************************************
      * Render
@@ -484,9 +345,11 @@ function deleteSelectedSet() {
       container.innerHTML = '';
 
       if (!activeFlashcards.length) {
-        container.innerHTML = `<p style="color: #2c2c2c; font-weight: bold; background: rgba(255,255,255,0.8); padding: 1vw; border-radius: 0.8vw;">
-          No questions available. Add or import some first, or load a set.
-        </p>`;
+        container.innerHTML = `
+          <p style="color: #2c2c2c; font-weight: bold; background: rgba(255,255,255,0.8);
+                    padding: 1vw; border-radius: 0.8vw;">
+            No questions available. Add or import some first, or load a set.
+          </p>`;
         return;
       }
 
@@ -518,7 +381,7 @@ function deleteSelectedSet() {
         feedbackEl.classList.add('feedback');
         cardDiv.appendChild(feedbackEl);
 
-        // Remove button for this card
+        // Remove button
         const removeBtn = document.createElement('button');
         removeBtn.textContent = "Remove";
         removeBtn.classList.add('remove-btn');
@@ -547,14 +410,9 @@ function deleteSelectedSet() {
           startVelocity: 15,
           spread: 360,
           ticks: 60,
-          origin: {
-            x: Math.random(),
-            y: Math.random() - 0.1
-          }
+          origin: { x: Math.random(), y: Math.random() - 0.1 }
         });
-        if (Date.now() < end) {
-          requestAnimationFrame(frame);
-        }
+        if (Date.now() < end) requestAnimationFrame(frame);
       })();
     }
 
@@ -577,7 +435,6 @@ function deleteSelectedSet() {
 
       const total = activeFlashcards.length;
       const percent = Math.round((score / total) * 100);
-
       scoreDiv.textContent = `You answered ${score} out of ${total} correctly (${percent}%).`;
 
       if (percent >= 70) {
@@ -595,17 +452,13 @@ function deleteSelectedSet() {
         localStorage.setItem('bestScore', bestScore);
         bestScoreDiv.textContent = `Best Score (All Time): ${bestScore}%`;
       }
-
-      // Reveal the floating Reset button
       resetFloatingBtn.style.display = 'block';
     }
 
-    // Update nextDue in the actual set data so spaced repetition logic remains
     function updateNextDueInSet(card, isCorrect) {
       if (!currentSetName) return;
       const setArray = flashcardSets[currentSetName];
       if (!setArray) return;
-
       const idx = setArray.findIndex(c => c.question === card.question);
       if (idx >= 0) {
         setArray[idx].selected = card.selected;
@@ -616,26 +469,22 @@ function deleteSelectedSet() {
     }
 
     function resetTest() {
-      activeFlashcards.forEach(card => {
-        card.selected = null;
-      });
+      activeFlashcards.forEach(card => { card.selected = null; });
       scoreDiv.textContent = 'You answered 0 out of 0 correctly (0%).';
       timeTakenDiv.textContent = 'Time Taken: 0 seconds';
-
       renderFlashcards();
       startTime = Date.now();
       resetFloatingBtn.style.display = 'none';
     }
 
     /**********************************************************
-     * Add / Remove All in the Current Active List
+     * Add / Remove All
      **********************************************************/
     function addQuestion() {
       if (!currentSetName) {
         alert("Please select or create a set before adding questions!");
         return;
       }
-
       const questionText = newQuestionEl.value.trim();
       if (!questionText) {
         alert("Please enter a question.");
@@ -684,16 +533,66 @@ function deleteSelectedSet() {
         alert("No questions to remove.");
         return;
       }
-      if (confirm("Remove all currently loaded questions (without deleting from the set)?")) {
+      // confirm might also not work in Electron, but let's keep it as is
+      if (confirm("Remove all currently loaded questions (set data remains)?")) {
         activeFlashcards = [];
         renderFlashcards();
-        alert("All active questions have been cleared (set is untouched).");
+        alert("All active questions cleared.");
       }
     }
 
     /**********************************************************
-     * CSV Import -> Store in a new set
+     * Replacing prompt() with a dialog for "Save as New Set"
      **********************************************************/
+    function showNewSetDialog() {
+      // Clear old input, show the dialog
+      newSetNameInput.value = "";
+      newSetDialog.style.display = "block";
+    }
+    function hideNewSetDialog() {
+      newSetDialog.style.display = "none";
+    }
+    function saveCurrentAsNewSet(newName) {
+      if (!activeFlashcards.length) {
+        alert("No questions to save!");
+        return;
+      }
+      if (!newName) {
+        alert("Save canceled, no name provided.");
+        return;
+      }
+      if (flashcardSets[newName]) {
+        alert(`A set named "${newName}" already exists. Please choose another name.`);
+        return;
+      }
+      // Create a deep copy
+      flashcardSets[newName] = activeFlashcards.map(card => structuredClone(card));
+      saveSetsToLocalStorage();
+      populateSetDropdown();
+      alert(`Saved ${activeFlashcards.length} questions as new set "${newName}".`);
+    }
+
+    // Hook up the dialog buttons
+    newSetNameConfirmBtn.addEventListener('click', () => {
+      const newName = newSetNameInput.value.trim();
+      hideNewSetDialog();
+      saveCurrentAsNewSet(newName);
+    });
+    newSetNameCancelBtn.addEventListener('click', () => {
+      hideNewSetDialog();
+      alert("Save canceled.");
+    });
+
+    /**********************************************************
+     * Replacing prompt() with a dialog for CSV import
+     **********************************************************/
+    function showImportCSVDialog() {
+      importSetNameInput.value = "";
+      importCSVDialog.style.display = "block";
+    }
+    function hideImportCSVDialog() {
+      importCSVDialog.style.display = "none";
+    }
     function parseCsv(csvText) {
       const lines = csvText.split(/\r?\n/).map(l => l.trim()).filter(l => l);
       const result = [];
@@ -713,15 +612,12 @@ function deleteSelectedSet() {
       });
       return result;
     }
-
-    function importFromCSV() {
+    function importFromCSV(setName) {
       const file = csvFileInput.files[0];
       if (!file) {
         alert("Please select a .csv file first!");
         return;
       }
-
-      const setName = prompt("Enter a name for this question set:");
       if (!setName) {
         alert("Import canceled, no set name provided.");
         return;
@@ -732,10 +628,9 @@ function deleteSelectedSet() {
         const text = e.target.result;
         const newCards = parseCsv(text);
         if (!newCards.length) {
-          alert("No questions found in the CSV, or format not recognized.");
+          alert("No questions found in the CSV or format not recognized.");
           return;
         }
-        // Save these cards under the new setName
         flashcardSets[setName] = newCards;
         saveSetsToLocalStorage();
         populateSetDropdown();
@@ -744,8 +639,19 @@ function deleteSelectedSet() {
       reader.readAsText(file);
     }
 
+    // Hook up the dialog buttons for CSV
+    importSetNameConfirmBtn.addEventListener('click', () => {
+      const setName = importSetNameInput.value.trim();
+      hideImportCSVDialog();
+      importFromCSV(setName);
+    });
+    importSetNameCancelBtn.addEventListener('click', () => {
+      hideImportCSVDialog();
+      alert("Import canceled.");
+    });
+
     /**********************************************************
-     * Load a chosen set => create a fresh copy in activeFlashcards
+     * Load a chosen set
      **********************************************************/
     function loadSelectedSet() {
       const chosen = setSelect.value;
@@ -755,7 +661,6 @@ function deleteSelectedSet() {
       }
       currentSetName = chosen;
       const setArray = flashcardSets[chosen] || [];
-      // Make a separate copy for activeFlashcards
       activeFlashcards = setArray.map(c => structuredClone(c));
       renderFlashcards();
     }
@@ -765,13 +670,10 @@ function deleteSelectedSet() {
      **********************************************************/
     function initApp() {
       loadSetsFromLocalStorage();
-
-      // If we stored a bestScore
       if (localStorage.getItem('bestScore')) {
         bestScore = parseInt(localStorage.getItem('bestScore'), 10);
         bestScoreDiv.textContent = `Best Score (All Time): ${bestScore}%`;
       }
-
       populateSetDropdown();
       startTime = Date.now();
     }
@@ -792,11 +694,11 @@ function deleteSelectedSet() {
     resetBtn.addEventListener('click', resetTest);
     submitBtn.addEventListener('click', submitTest);
     addQuestionBtn.addEventListener('click', addQuestion);
-    csvImportBtn.addEventListener('click', importFromCSV);
+    csvImportBtn.addEventListener('click', showImportCSVDialog);
     loadSetBtn.addEventListener('click', loadSelectedSet);
+    deleteSetBtn.addEventListener('click', deleteSelectedSet);
+    saveCurrentAsSetBtn.addEventListener('click', showNewSetDialog);
     resetFloatingBtn.addEventListener('click', resetTest);
-    document.getElementById('save-current-as-set-btn').addEventListener('click', saveCurrentAsNewSet);
-    document.getElementById('delete-set-btn').addEventListener('click', deleteSelectedSet);
 
     initApp();
   </script>
