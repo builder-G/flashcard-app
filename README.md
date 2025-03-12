@@ -24,3 +24,8 @@ You have two options for the number of possible answers:
 What is this author's favorite color?; Blue; Green; Brown; Black; Blue
 ```
 In the above example, Blue would be the right answer. Happy studying!
+
+Feel free to provide feedback here!
+https://forms.gle/1LJrkAB3Akcwhtvv8 
+
+Tutorial: https://docs.google.com/document/d/1TMCf07BDj59EelC62MT8sZdGAeXbrYR_cW1Ijk8vTuY/edit?usp=sharing
