@@ -38,6 +38,7 @@
         "provider": "github",
         "owner": "builder-G",
         "repo": "flashcard-app"
+        "releaseType": "release"
       }
     ]
   }
