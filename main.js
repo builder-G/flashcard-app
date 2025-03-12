@@ -1,40 +1,64 @@
+// main.js
 const { app, BrowserWindow } = require('electron');
 const path = require('path');
-
-// 1) If you want auto-updates:
 const { autoUpdater } = require('electron-updater');
 
+let mainWindow;
+
 function createWindow() {
-  const mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 1000,
     height: 800,
     webPreferences: {
-      nodeIntegration: false,
-      contextIsolation: true
-    }
+      nodeIntegration: true,
+      contextIsolation: false, 
+    },
   });
 
-  // Load your flashcard HTML
-  mainWindow.loadFile('flashcard.html');
+  // Load your main HTML file:
+  mainWindow.loadFile(path.join(__dirname, 'flashcard.html'));
+
+  mainWindow.on('closed', () => {
+    mainWindow = null;
+  });
 }
 
-// Once Electron is ready:
+// Called when Electron has finished initialization
 app.whenReady().then(() => {
   createWindow();
 
-  // 2) Check for updates if you're using autoUpdater
+  // This triggers a background check for updates on GitHub
   autoUpdater.checkForUpdatesAndNotify();
 });
 
-// On macOS, re-open app if user clicks its dock icon
+// Below are some optional listeners to see what’s happening with updates
+autoUpdater.on('update-available', (info) => {
+  console.log('A new update is available:', info);
+});
+
+autoUpdater.on('update-not-available', () => {
+  console.log('No update available.');
+});
+
+autoUpdater.on('update-downloaded', (info) => {
+  console.log('Update downloaded; will install now:', info);
+  // Automatically install and restart the app
+  autoUpdater.quitAndInstall();
+});
+
+autoUpdater.on('error', (err) => {
+  console.error('Auto-updater error:', err);
+});
+
+// On macOS, re-create the window if the dock icon is clicked
 app.on('activate', () => {
-  if (BrowserWindow.getAllWindows().length === 0) {
+  if (mainWindow === null) {
     createWindow();
   }
 });
 
+// Quit when all windows are closed (except on macOS)
 app.on('window-all-closed', () => {
-  // On non-macOS, quit app
   if (process.platform !== 'darwin') {
     app.quit();
   }
