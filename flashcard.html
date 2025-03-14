@@ -468,43 +468,69 @@
     }
 
     function submitTest() {
-      if (!activeFlashcards.length) {
-        alert("No questions to submit!");
-        return;
-      }
+  if (!activeFlashcards.length) {
+    alert("No questions to submit!");
+    return;
+  }
 
-      let score = 0;
-      activeFlashcards.forEach(card => {
-        if (card.selected && card.selected === card.answer) {
-          score++;
-          updateNextDueInSet(card, true);
-        } else {
-          updateNextDueInSet(card, false);
-        }
-      });
-      saveSetsToLocalStorage();
-
-      const total = activeFlashcards.length;
-      const percent = Math.round((score / total) * 100);
-      scoreDiv.textContent = `You answered ${score} out of ${total} correctly (${percent}%).`;
-
-      if (percent >= 70) {
-        successSound.play().catch(err => console.log("Success sound error:", err));
-        runConfetti();
-      } else {
-        failSound.play().catch(err => console.log("Fail sound error:", err));
-      }
-
-      const timeTaken = Math.floor((Date.now() - startTime) / 1000);
-      timeTakenDiv.textContent = `Time Taken: ${timeTaken} seconds`;
-
-      if (percent > bestScore) {
-        bestScore = percent;
-        localStorage.setItem('bestScore', bestScore);
-        bestScoreDiv.textContent = `Best Score (All Time): ${bestScore}%`;
-      }
-      resetFloatingBtn.style.display = 'block';
+  let score = 0;
+  activeFlashcards.forEach((card, index) => {
+    // Check if user selected the right answer
+    const isCorrect = card.selected && (card.selected === card.answer);
+    if (isCorrect) {
+      score++;
+      updateNextDueInSet(card, true);
+    } else {
+      updateNextDueInSet(card, false);
     }
+
+    // Grab the .flashcard DOM element
+    const cardDiv = container.children[index];
+    // Find the .feedback div
+    const feedbackEl = cardDiv.querySelector('.feedback');
+
+    // Clear old feedback classes
+    feedbackEl.classList.remove('correct', 'incorrect');
+
+    // Show new feedback
+    if (isCorrect) {
+      feedbackEl.classList.add('correct');
+      feedbackEl.textContent = 'Correct!';
+    } else {
+      feedbackEl.classList.add('incorrect');
+      feedbackEl.textContent = 'Incorrect. The right answer is: ' + card.answer;
+    }
+    feedbackEl.style.display = 'block';
+  });
+
+  // Calculate overall score
+  const total = activeFlashcards.length;
+  const percent = Math.round((score / total) * 100);
+  scoreDiv.textContent = `You answered ${score} out of ${total} correctly (${percent}%).`;
+
+  // Success or fail sound + confetti
+  if (percent >= 70) {
+    successSound.play().catch(err => console.log("Success sound error:", err));
+    runConfetti();
+  } else {
+    failSound.play().catch(err => console.log("Fail sound error:", err));
+  }
+
+  // Show time taken
+  const timeTaken = Math.floor((Date.now() - startTime) / 1000);
+  timeTakenDiv.textContent = `Time Taken: ${timeTaken} seconds`;
+
+  // Update best score
+  if (percent > bestScore) {
+    bestScore = percent;
+    localStorage.setItem('bestScore', bestScore);
+    bestScoreDiv.textContent = `Best Score (All Time): ${bestScore}%`;
+  }
+
+  // Show the floating "Reset Test" button
+  resetFloatingBtn.style.display = 'block';
+}
+
 
     function updateNextDueInSet(card, isCorrect) {
       if (!currentSetName) return;
