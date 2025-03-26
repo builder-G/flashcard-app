@@ -1,8 +1,4 @@
 # flashcard-app
-capybara image: [Source](https://wallpapers.com/wallpapers/capybara-digital-art-32mfefd9pdr01p5g.html)
-
-This project uses the above capybara image as the background in our Flashcard app. 
-All credit goes to the original author.
 
 ## CSV File Format for Questions
 

@@ -1,783 +1,383 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Gary's Capybara Flashcard App</title>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Lobster&display=swap">
-  <style>
-    /* Same basic styling as before */
-    * {
-      box-sizing: border-box;
-    }
-    body {
-      margin: 0; padding: 0;
-      font-family: 'Montserrat', sans-serif;
-      color: #333;
-      min-height: 100vh;
-      display: flex; flex-direction: column; align-items: center;
-      background:
-        linear-gradient(rgba(255,255,255,0.3), rgba(255,255,255,0.3)),
-        url('capybara-theme.png') no-repeat center center fixed;
-      background-size: cover;
-    }
-    h1 {
-      margin-top: 2vw; margin-bottom: 1vw;
-      font-family: 'Lobster', cursive;
-      color: #8B4513;
-      text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
-      background: rgba(255,255,255,0.6);
-      padding: 1vw 2vw; border-radius: 1vw; font-size: 2.5vw;
-    }
-    .controls,
-    #csv-import,
-    #question-form,
-    #set-management {
-      width: 90%; max-width: 900px;
-      background: rgba(255,255,255,0.7);
-      border-radius: 2vw;
-      padding: 2vw; margin: 1vw 0;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      position: relative;
-    }
-    #flashcards-container {
-      width: 90%; max-width: 900px; margin: 1vw 0;
-    }
-    .flashcard {
-      background: rgba(255,255,255,0.8);
-      border-radius: 2vw;
-      padding: 2vw; margin-bottom: 2vw;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      transition: transform 0.2s;
-      position: relative;
-      cursor: pointer;
-    }
-    .flashcard:hover { transform: scale(1.02); }
-    .question { font-size: 1.2vw; margin-bottom: 1vw; font-weight: bold; color: #2c2c2c; }
-    .options { list-style: none; padding: 0; }
-    .options li {
-      padding: 1vw 1.5vw; margin: 1vw 0;
-      background: #f1f1f1; border-radius: 0.5vw; cursor: pointer;
-      transition: background 0.2s, color 0.2s; font-size: 1vw;
-    }
-    .options li:hover { background: #e0e0e0; }
-    .options li.selected { background: #5563DE; color: #fff; }
-    .feedback {
-      font-size: 1vw; font-weight: bold; text-align: center;
-      margin-top: 1vw; padding: 1vw; border-radius: 0.8vw; display: none;
-    }
-    .feedback.correct { background: #4CAF50; color: #fff; }
-    .feedback.incorrect { background: #F44336; color: #fff; }
-    .remove-btn {
-      position: absolute; bottom: 1vw; right: 1vw;
-      background: #f44336; font-size: 1vw; padding: 0.5vw 1vw;
-      border: none; border-radius: 0.5vw; cursor: pointer;
-      transition: background 0.3s;
-    }
-    .remove-btn:hover { background: #c0392b; }
-    button {
-      font-family: 'Montserrat', sans-serif; font-weight: 500;
-      margin: 0.5vw; padding: 1vw 1.5vw; font-size: 1vw;
-      background: #E6A15E; color: #fff; border: none; border-radius: 1vw;
-      cursor: pointer; transition: background 0.3s, transform 0.2s;
-    }
-    button:hover { background: #d89054; transform: translateY(-2px); }
-    #submit-btn {
-      position: fixed; left: 2vw; top: 50vh; transform: translateY(-50%);
-      z-index: 999; font-size: 2vw; padding: 1.2vw 2vw;
-      box-shadow: 0.4vw 0.4vw 0.8vw rgba(0,0,0,0.3);
-    }
-    #reset-floating-btn {
-      display: none; position: fixed; left: 2vw; top: 60vh; transform: translateY(-50%);
-      z-index: 999; font-size: 2vw; padding: 1.2vw 2vw;
-      box-shadow: 0.4vw 0.4vw 0.8vw rgba(0,0,0,0.3);
-    }
-    #score-container {
-      position: fixed; top: 1vw; right: 1vw;
-      background: rgba(255,255,255,0.7); border-radius: 1vw;
-      padding: 1vw 1.5vw; box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-      text-align: right; z-index: 999; min-width: 10vw;
-      transform: scale(0.7); transform-origin: top right;
-    }
-    #score-container p {
-      margin: 0.5vw 0; font-weight: bold; color: #2c2c2c; font-size: 1.2vw;
-    }
-    label {
-      display: block; margin-bottom: 0.5vw; font-weight: bold;
-      color: #2c2c2c; font-size: 1vw;
-    }
-    input[type="text"] {
-      width: 100%; padding: 0.8vw; margin-bottom: 0.5vw;
-      border-radius: 0.5vw; border: 0.1vw solid #ccc; font-size: 1vw;
-    }
-    .radio-group {
-      display: flex; align-items: center; margin: 0.5vw 0;
-    }
-    .radio-group input[type="radio"] {
-      margin-right: 0.5vw; transform: scale(1.5);
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gary's Capybara Flashcards</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Lobster&display=swap">
+    <style>
+        /* Capybara Theme with Background Image */
+        body {
+            font-family: 'Montserrat', sans-serif;
+            max-width: 850px;
+            margin: 20px auto;
+            padding: 15px;
+            background-image: url('capybara-theme.jpg'); /* Ensure image is in same folder */
+            background-size: cover;
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-color: #fdfaf6; /* Fallback color */
+            color: #3a3a3a;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        .container, .controls, .add-question-container, .import-export-container, .question-set-container {
+            background: rgba(253, 250, 246, 0.95); /* Creamy off-white + slight transparency */
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+            margin-bottom: 20px;
+        }
+        /* --- Title Color Changed --- */
+        h1 {
+            font-family: 'Lobster', cursive;
+            color: #fff8e7; /* Lighter creamy color for better contrast */
+            text-align: center;
+            margin-bottom: 1.2em;
+            font-size: 2.8em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5); /* Darker shadow for pop */
+        }
+        h2, h3 { color: #6a4c3b; text-align: center; margin-bottom: 1.2em; }
+        .flashcard {
+            border: 1px solid #c8d7d3; padding: 15px; margin-bottom: 15px; border-radius: 8px;
+            background-color: rgba(255, 255, 255, 0.98); transition: transform 0.3s ease, box-shadow 0.3s ease; position: relative;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .flashcard:hover { box-shadow: 0 5px 12px rgba(0, 0, 0, 0.2); transform: translateY(-3px); }
+        .question-text { font-weight: bold; color: #4a3c34; margin-bottom: 12px; font-size: 1.1em; }
+        .options { list-style: none; padding: 0; }
+        .options li {
+            margin-bottom: 8px; padding: 10px; border: 1px solid #e0e0e0; border-radius: 6px; cursor: pointer;
+            transition: background-color 0.2s ease, border-color 0.2s ease; background-color: rgba(255, 255, 255, 0.8);
+        }
+        .options li:hover { background-color: rgba(245, 245, 245, 0.9); border-color: #c8d7d3; }
+        .options li.selected { background-color: rgba(216, 226, 220, 0.9); font-weight: bold; border-color: #b8c7c2; }
+        .options li.correct { background-color: rgba(215, 236, 217, 0.9); border-color: #b3d9b7; color: #285c34; }
+        .options li.incorrect { background-color: rgba(253, 226, 226, 0.9); border-color: #f8c1c1; color: #a33a3a; }
+        .feedback { margin-top: 12px; font-style: italic; font-size: 0.95em; padding: 5px; border-radius: 4px; background-color: rgba(255,255,255,0.7); }
+        .feedback.correct { color: #285c34; }
+        .feedback.incorrect { color: #a33a3a; }
+        .controls, .add-question-container, .import-export-container, .question-set-container {
+            display: flex; flex-wrap: wrap; gap: 12px; justify-content: center;
+        }
+        .add-question-container, .import-export-container, .question-set-container { flex-direction: column; }
+        button, input[type="file"], select {
+            padding: 10px 18px; border: 1px solid #b8c7c2; border-radius: 6px; cursor: pointer;
+            background-color: rgba(240, 247, 246, 0.9); color: #4a3c34; font-size: 0.95em;
+            transition: background-color 0.2s ease, box-shadow 0.2s ease; font-family: inherit; box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+         input[type="file"] { background-color: rgba(255,255,255, 0.9); }
+        button:hover, input[type="file"]::file-selector-button:hover, select:hover { background-color: rgba(216, 226, 220, 0.95); box-shadow: 0 2px 4px rgba(0,0,0,0.15); }
+        button:disabled { background-color: #e0e0e0; cursor: not-allowed; box-shadow: none; opacity: 0.6; }
+        #submit-btn { background-color: #5a8a5e; color: white; border: none; font-weight: bold; }
+        #submit-btn:hover { background-color: #4a7a4e; }
+        #remove-all-btn, #delete-set-btn, .remove-card-btn { background-color: #c86a5a; color: white; border: none; }
+        #remove-all-btn:hover, #delete-set-btn:hover, .remove-card-btn:hover { background-color: #b85a4a; }
+        .stats { text-align: center; margin-bottom: 20px; font-size: 1em; color: #6a4c3b; background-color: rgba(253, 250, 246, 0.85); padding: 8px; border-radius: 5px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);}
+        #add-question-form label, #add-question-form input[type="text"], #add-question-form button { display: block; margin-bottom: 10px; width: 100%; } /* Adjusted width */
+         #add-question-form label { color: #6a4c3b; font-weight: 500; margin-bottom: 5px; }
+        #add-question-form input[type="text"] { padding: 10px; border: 1px solid #c8d7d3; border-radius: 6px; background-color: rgba(255,255,255, 0.9); width: 100%;}
+        #add-question-form .option-group { display: flex; align-items: center; margin-bottom: 8px; }
+        #add-question-form .option-group input[type="radio"] { margin-right: 10px; width: auto; margin-bottom: 0; accent-color: #6a4c3b; flex-shrink: 0; transform: scale(1.1); }
+        #add-question-form .option-group input[type="text"] { flex-grow: 1; margin-bottom: 0; }
 
-    /* ====== Flip Mode styling ====== */
-    /* We'll style .flipcard-front and .flipcard-back for a simple reveal */
-    .flipcard-front, .flipcard-back {
-      display: none; /* hidden by default; we show/hide in JS */
-    }
-    .flipcard-back {
-      margin-top: 1vw;
-      font-style: italic;
-      color: #444;
-      background: #fffde0;
-      border-radius: 1vw;
-      padding: 1vw;
-    }
-  </style>
+        /* Edit Mode Styles */
+        .flashcard .edit-controls { display: none; background-color: rgba(255, 250, 240, 0.95); padding: 10px; border-radius: 6px; border: 1px dashed #b8c7c2; }
+        body.edit-mode-active .flashcard .question-text, /* Hide static question */
+        body.edit-mode-active .flashcard .options, /* Hide static options */
+        body.edit-mode-active .flashcard .feedback,
+        body.edit-mode-active .flashcard .question-part,
+        body.edit-mode-active .flashcard .answer-part { display: none; }
+        body.edit-mode-active .flashcard .edit-controls { display: block; }
+
+        .flashcard .edit-controls textarea,
+        .flashcard .edit-controls input[type="text"] { width: 100%; padding: 8px; margin-bottom: 8px; border: 1px solid #c8d7d3; border-radius: 6px; font-family: inherit; background-color: #fff; }
+         .flashcard .edit-controls label { color: #6a4c3b; font-weight: 500; margin-bottom: 5px; display: block; }
+        .flashcard .edit-controls .edit-option-group { display: flex; align-items: center; margin-bottom: 8px; }
+         .flashcard .edit-controls .edit-option-group input[type="radio"] { margin-right: 8px; flex-shrink: 0; accent-color: #6a4c3b; transform: scale(1.1); }
+         .flashcard .edit-controls .edit-option-group input[type="text"] { flex-grow: 1; margin-bottom: 0; }
+        .flashcard .edit-action-buttons { margin-top: 15px; display: flex; gap: 10px; justify-content: center; }
+        .flashcard .edit-action-buttons button { padding: 6px 12px; font-size: 0.85em; }
+        .flashcard .remove-card-btn { position: absolute; top: 8px; right: 8px; padding: 4px 8px; font-size: 0.75em; border-radius: 4px; }
+         .flashcard .remove-option-btn { background-color: #d98479; color: white; border: none; padding: 3px 8px; font-size: 12px; border-radius: 4px; cursor: pointer; margin-left: 5px; line-height: 1; flex-shrink: 0; }
+         .flashcard .remove-option-btn:hover { background-color: #c86a5a; }
+         .flashcard .add-option-btn { margin-top: 10px; background: #7bb97e; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.9em; }
+         .flashcard .add-option-btn:hover { background-color: #5a8a5e; }
+
+         /* Flipped state */
+        .flashcard.flipped .question-part { display: none; }
+        .flashcard .answer-part { display: none; }
+        .flashcard.flipped .answer-part { display: block; }
+        .flashcard .answer-text { font-style: italic; color: #5a8a5e; text-align: center; padding: 15px; background-color: rgba(232, 243, 233, 0.95); border-radius: 6px; font-size: 1.1em; }
+
+        /* Import/Export & Set Management */
+        .import-export-container small, .question-set-container label, .add-question-container label { color: #6a4c3b; font-size: 0.9em; }
+         #new-set-name, #import-new-set-name { margin-top: 10px; padding: 8px 10px; border: 1px solid #c8d7d3; border-radius: 6px; width: 100%; background-color: rgba(255,255,255, 0.9); } /* Input slight transparency & full width */
+         .import-export-container > div > div { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;} /* Center import/export buttons */
+
+          /* Responsive */
+         @media (max-width: 768px) {
+             h1 { font-size: 2.2em; }
+             body { font-size: 14px; max-width: 95%; }
+             .flashcard, .controls, .add-question-container, .import-export-container, .question-set-container { padding: 15px; border-radius: 8px; }
+             button, input[type="file"], select, input[type="text"], textarea { font-size: inherit; }
+             #submit-btn { font-size: 1em; padding: 10px 15px; }
+             .stats { font-size: 0.9em; }
+             #add-question-form input[type="text"] { width: 100%; } /* Ensure full width on smaller */
+             #new-set-name, #import-new-set-name { width: 100%; }
+         }
+         @media (max-width: 480px) {
+             h1 { font-size: 1.8em; }
+             body { font-size: 13px; padding: 10px; }
+             .controls { gap: 5px; }
+             button, input[type="file"], select { padding: 8px 10px; }
+             #submit-btn { position: static; transform: none; margin-top: 15px; width: 100%; } /* Submit button normal flow */
+         }
+
+    </style>
 </head>
 <body>
-  <h1>Gary's Capybara Flashcard App</h1>
-  <div id="score-container">
-    <p id="score">You answered 0 out of 0 correctly (0%).</p>
-    <p id="best-score">Best Score (All Time): 0%</p>
-    <p id="time-taken">Time Taken: 0 seconds</p>
-  </div>
 
-  <div class="controls">
-    <button id="remove-all-btn">Remove All Questions</button>
-    <button id="shuffle-btn">Shuffle Questions</button>
-    <button id="reset-btn">Reset Test</button>
-    <!-- NEW: Flip Mode toggle button -->
-    <button id="flip-mode-btn">Flip Mode: OFF</button>
-  </div>
+    <h1>Gary's Capybara Flashcards</h1>
 
-  <div id="set-management">
-    <h2>Manage Question Sets</h2>
-    <label for="set-select">Select a Question Set:</label>
-    <select id="set-select"></select>
-    <button id="load-set-btn">Load Set</button>
-    <button id="save-current-as-set-btn">Save Current as New Set</button>
-    <button id="delete-set-btn">Delete Set</button>
-  </div>
-
-  <div id="csv-import">
-    <h2>Select a CSV File, Then Add CSV to New Set</h2>
-    <p><em>Rows can have 6 columns (4 options) or 7 columns (5 options) + final column for correct answer.</em></p>
-    <input type="file" id="csv-file" accept=".csv" />
-    <button id="csv-import-btn">Add CSV to New Set</button>
-  </div>
-
-  <div id="question-form">
-    <h2>Add New Question</h2>
-    <div>
-      <label for="new-question">Question:</label>
-      <input type="text" id="new-question" placeholder="Enter your question..." />
+    <div class="controls">
+        <button id="remove-all-btn">Remove All</button>
+        <button id="shuffle-btn">Shuffle Cards</button>
+        <button id="reset-btn">Reset Test</button>
+        <button id="flip-mode-btn">Flip Mode: OFF</button>
+        <button id="edit-mode-btn">Edit Mode: OFF</button>
     </div>
-    <label>Options (up to 5):</label>
-    <div class="radio-group">
-      <input type="radio" name="correctOption" value="0" checked />
-      <input type="text" id="option0" placeholder="Option A" />
+
+     <div class="question-set-container">
+        <h3>Manage Question Sets</h3>
+        <label for="question-set-select">Select a Question Set:</label>
+        <select id="question-set-select"></select>
+        <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+            <button id="load-set-btn">Load Set</button>
+            <button id="save-set-btn">Save Current as New Set</button>
+            <button id="delete-set-btn">Delete Set</button>
+        </div>
+        <input type="text" id="new-set-name" placeholder="Enter new set name (for saving)">
     </div>
-    <div class="radio-group">
-      <input type="radio" name="correctOption" value="1" />
-      <input type="text" id="option1" placeholder="Option B" />
+
+    <div class="import-export-container">
+        <h3>Import/Export Sets</h3>
+        <div style="margin-bottom: 15px;">
+             <label for="import-file">Import from CSV/TXT/JSON:</label>
+             <input type="file" id="import-file" accept=".csv, .txt, .json">
+             <div> <button id="import-to-current-btn">Add to Current Set</button>
+                 <button id="import-to-new-btn">Import as New Set</button>
+             </div>
+             <input type="text" id="import-new-set-name" placeholder="Name for new set (if importing)">
+             <small>Format: Question;OptA;OptB;[OptC];[OptD];[OptE];CorrectAnswerText (Use ';')</small><br>
+             <small>JSON: Array of {"question": "Q", "options": ["A", "B"], "correctAnswer": "B"}</small>
+        </div>
+         <div>
+             <label for="export-format">Export Current Set As:</label>
+             <select id="export-format">
+                 <option value="csv">CSV</option>
+                 <option value="txt">TXT</option>
+                 <option value="json">JSON</option>
+             </select>
+            <button id="export-btn">Export Set</button>
+         </div>
     </div>
-    <div class="radio-group">
-      <input type="radio" name="correctOption" value="2" />
-      <input type="text" id="option2" placeholder="Option C (optional)" />
+
+    <div class="add-question-container">
+        <h2>Add New Question</h2>
+        <form id="add-question-form">
+            <label for="question">Question:</label>
+            <input type="text" id="question" placeholder="Enter your question..." required>
+            <label>Options (Mark Correct Answer):</label>
+            <div class="option-group"><input type="radio" name="correct-option-add" value="0" required><input type="text" class="option-input" placeholder="Option A" required></div>
+            <div class="option-group"><input type="radio" name="correct-option-add" value="1"><input type="text" class="option-input" placeholder="Option B" required></div>
+            <div class="option-group"><input type="radio" name="correct-option-add" value="2"><input type="text" class="option-input" placeholder="Option C (optional)"></div>
+            <div class="option-group"><input type="radio" name="correct-option-add" value="3"><input type="text" class="option-input" placeholder="Option D (optional)"></div>
+            <div class="option-group"><input type="radio" name="correct-option-add" value="4"><input type="text" class="option-input" placeholder="Option E (optional)"></div>
+            <button type="submit">Add Question</button>
+        </form>
     </div>
-    <div class="radio-group">
-      <input type="radio" name="correctOption" value="3" />
-      <input type="text" id="option3" placeholder="Option D (optional)" />
+
+    <div class="stats">
+        Score: <span id="score">0</span>/<span id="total-questions">0</span> (<span id="percentage">0</span>%) |
+        Best Score: <span id="best-score">0</span> | Time: <span id="timer">0s</span>
     </div>
-    <div class="radio-group">
-      <input type="radio" name="correctOption" value="4" />
-      <input type="text" id="option4" placeholder="Option E (optional)" />
+
+    <div id="flashcard-container" class="container">
+        <p>Loading questions...</p>
     </div>
-    <button id="add-question-btn">Add Question</button>
-  </div>
 
-  <div id="flashcards-container"></div>
+    <div class="controls" style="margin-top: 20px;">
+        <button id="submit-btn">Submit Test</button>
+    </div>
 
-  <button id="submit-btn">Submit Test</button>
-  <button id="reset-floating-btn" style="display:none;">Reset Test</button>
 
-  <audio id="success-sound">
-    <source src="success.mp3" type="audio/mpeg">
-  </audio>
-  <audio id="fail-sound">
-    <source src="fail.mp3" type="audio/mpeg">
-  </audio>
+    <script>
+        // --- DOM Elements ---
+        const container = document.getElementById('flashcard-container');
+        const addQuestionForm = document.getElementById('add-question-form');
+        const questionInput = document.getElementById('question');
+        const optionInputs = addQuestionForm.querySelectorAll('.option-input');
+        const correctOptionRadios = addQuestionForm.querySelectorAll('input[name="correct-option-add"]');
+        const submitBtn = document.getElementById('submit-btn');
+        const scoreDisplay = document.getElementById('score');
+        const totalQuestionsDisplay = document.getElementById('total-questions');
+        const percentageDisplay = document.getElementById('percentage');
+        const bestScoreDisplay = document.getElementById('best-score');
+        const timerDisplay = document.getElementById('timer');
+        const removeAllBtn = document.getElementById('remove-all-btn');
+        const shuffleBtn = document.getElementById('shuffle-btn');
+        const resetBtn = document.getElementById('reset-btn');
+        const flipModeBtn = document.getElementById('flip-mode-btn');
+        const editModeBtn = document.getElementById('edit-mode-btn');
+        const setSelect = document.getElementById('question-set-select');
+        const loadSetBtn = document.getElementById('load-set-btn');
+        const saveSetBtn = document.getElementById('save-set-btn');
+        const newSetNameInput = document.getElementById('new-set-name');
+        const deleteSetBtn = document.getElementById('delete-set-btn');
+        const importFile = document.getElementById('import-file');
+        const importToCurrentBtn = document.getElementById('import-to-current-btn');
+        const importToNewBtn = document.getElementById('import-to-new-btn');
+        const importNewSetNameInput = document.getElementById('import-new-set-name');
+        const exportFormatSelect = document.getElementById('export-format');
+        const exportBtn = document.getElementById('export-btn');
 
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+        // --- State Variables ---
+        let questions = [];
+        let userAnswers = {};
+        let score = 0;
+        let startTime;
+        let timerInterval;
+        let testSubmitted = false;
+        // Ensure bestScore retrieved from localStorage is treated as a number initially
+        let bestScore = parseFloat(localStorage.getItem('capybaraBestScore')) || 0;
+        let currentSetName = 'default-set';
+        let flipMode = false;
+        let editMode = false;
+        const QUESTION_SETS_KEY = 'capybaraQuestionSets';
 
-  <!-- 
-       NEW DIALOGS (replaces prompt) 
-       We'll show/hide these programmatically 
-  -->
-  <div id="newSetDialog" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
-       background-color:white; padding:20px; border:2px solid #ccc; z-index:9999;">
-    <label for="newSetNameInput">New Set Name:</label>
-    <input type="text" id="newSetNameInput" />
-    <br>
-    <button id="newSetNameConfirmBtn">OK</button>
-    <button id="newSetNameCancelBtn">Cancel</button>
-  </div>
+        // --- Functions ---
 
-  <div id="importCSVDialog" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
-       background-color:white; padding:20px; border:2px solid #ccc; z-index:9999;">
-    <label for="importSetNameInput">Set Name for CSV:</label>
-    <input type="text" id="importSetNameInput" />
-    <br>
-    <button id="importSetNameConfirmBtn">OK</button>
-    <button id="importSetNameCancelBtn">Cancel</button>
-  </div>
-
-  <script>
-    /**********************************************************
-     *  MULTIPLE SETS + Flip Mode
-    **********************************************************/
-    let flashcardSets = {};
-    let currentSetName = null;
-    let activeFlashcards = [];
-
-    let startTime;
-    let bestScore = 0;
-
-    // FLIP MODE global toggle
-    let flipMode = false;
-
-    const container       = document.getElementById('flashcards-container');
-    const removeAllBtn    = document.getElementById('remove-all-btn');
-    const submitBtn       = document.getElementById('submit-btn');
-    const shuffleBtn      = document.getElementById('shuffle-btn');
-    const resetBtn        = document.getElementById('reset-btn');
-    const flipModeBtn     = document.getElementById('flip-mode-btn');
-    const scoreDiv        = document.getElementById('score');
-    const bestScoreDiv    = document.getElementById('best-score');
-    const timeTakenDiv    = document.getElementById('time-taken');
-    const successSound    = document.getElementById('success-sound');
-    const failSound       = document.getElementById('fail-sound');
-    const resetFloatingBtn= document.getElementById('reset-floating-btn');
-
-    // Add Question Form
-    const addQuestionBtn  = document.getElementById('add-question-btn');
-    const newQuestionEl   = document.getElementById('new-question');
-    const optionEls       = [
-      document.getElementById('option0'),
-      document.getElementById('option1'),
-      document.getElementById('option2'),
-      document.getElementById('option3'),
-      document.getElementById('option4')
-    ];
-
-    // CSV Import
-    const csvFileInput    = document.getElementById('csv-file');
-    const csvImportBtn    = document.getElementById('csv-import-btn');
-
-    // Set Management
-    const setSelect       = document.getElementById('set-select');
-    const loadSetBtn      = document.getElementById('load-set-btn');
-    const deleteSetBtn    = document.getElementById('delete-set-btn');
-    const saveCurrentAsSetBtn = document.getElementById('save-current-as-set-btn');
-
-    // Our new "dialogs"
-    const newSetDialog              = document.getElementById('newSetDialog');
-    const newSetNameInput           = document.getElementById('newSetNameInput');
-    const newSetNameConfirmBtn      = document.getElementById('newSetNameConfirmBtn');
-    const newSetNameCancelBtn       = document.getElementById('newSetNameCancelBtn');
-
-    const importCSVDialog           = document.getElementById('importCSVDialog');
-    const importSetNameInput        = document.getElementById('importSetNameInput');
-    const importSetNameConfirmBtn   = document.getElementById('importSetNameConfirmBtn');
-    const importSetNameCancelBtn    = document.getElementById('importSetNameCancelBtn');
-
-    /**********************************************************
-     * Local Storage
-     **********************************************************/
-    function loadSetsFromLocalStorage() {
-      const saved = localStorage.getItem('flashcardSets');
-      if (saved) {
-        flashcardSets = JSON.parse(saved);
-      } else {
-        // Default sample set
-        flashcardSets = {
-          "Sample": [
-            {
-              question: "Sample Q: Which factor increases voluntary alcohol consumption in capybaras?",
-              options: [
-                "Offering them only unsweetened water",
-                "Sweetening with sucrose or using food/water deprivation",
-                "Exposing them only to high doses that produce sedation",
-                "Using capybara-friendly herbal infusions"
-              ],
-              answer: "Sweetening with sucrose or using food/water deprivation",
-              nextDue: 0
-            }
-          ]
-        };
-      }
-    }
-
-    function saveSetsToLocalStorage() {
-      localStorage.setItem('flashcardSets', JSON.stringify(flashcardSets));
-    }
-
-    /**********************************************************
-     * Populate set dropdown
-     **********************************************************/
-    function populateSetDropdown() {
-      setSelect.innerHTML = '';
-      for (let setName in flashcardSets) {
-        const opt = document.createElement('option');
-        opt.value = setName;
-        opt.textContent = setName;
-        setSelect.appendChild(opt);
-      }
-    }
-
-    /**********************************************************
-     * Delete a set
-     **********************************************************/
-    function deleteSelectedSet() {
-      const chosen = setSelect.value;
-      if (!chosen) {
-        alert("No set selected to delete!");
-        return;
-      }
-      if (!flashcardSets[chosen]) {
-        alert("That set does not exist.");
-        return;
-      }
-      if (confirm(`Are you sure you want to delete the entire set "${chosen}"?`)) {
-        delete flashcardSets[chosen];
-        saveSetsToLocalStorage();
-        populateSetDropdown();
-        if (currentSetName === chosen) {
-          currentSetName = null;
-          activeFlashcards = [];
-          renderFlashcards();
-        }
-        alert(`Set "${chosen}" has been deleted.`);
-      }
-    }
-
-    /**********************************************************
-     * Render
-     **********************************************************/
-    function renderFlashcards() {
-      container.innerHTML = '';
-
-      if (!activeFlashcards.length) {
-        container.innerHTML = `
-          <p style="color: #2c2c2c; font-weight: bold; background: rgba(255,255,255,0.8);
-                    padding: 1vw; border-radius: 0.8vw;">
-            No questions available. Add or import some first, or load a set.
-          </p>`;
-        return;
-      }
-
-      // If we're in flipMode, we just show front/back. Otherwise, show multiple choice.
-      activeFlashcards.forEach((card, index) => {
-        const cardDiv = document.createElement('div');
-        cardDiv.classList.add('flashcard');
-
-        if (!flipMode) {
-          // Normal multiple-choice rendering
-          const questionEl = document.createElement('div');
-          questionEl.classList.add('question');
-          questionEl.textContent = `Q${index + 1}: ${card.question}`;
-          cardDiv.appendChild(questionEl);
-
-          const optionsList = document.createElement('ul');
-          optionsList.classList.add('options');
-          card.options.forEach(option => {
-            if (!option) return;
-            const li = document.createElement('li');
-            li.textContent = option;
-            li.addEventListener('click', () => {
-              [...optionsList.children].forEach(sib => sib.classList.remove('selected'));
-              li.classList.add('selected');
-              card.selected = option;
-            });
-            optionsList.appendChild(li);
-          });
-          cardDiv.appendChild(optionsList);
-
-          const feedbackEl = document.createElement('div');
-          feedbackEl.classList.add('feedback');
-          cardDiv.appendChild(feedbackEl);
-
-        } else {
-          // Flip Mode rendering (front/back)
-          const frontDiv = document.createElement('div');
-          frontDiv.classList.add('flipcard-front');
-          frontDiv.textContent = `Q${index + 1}: ${card.question}`;
-          // Show front by default
-          frontDiv.style.display = 'block';
-
-          const backDiv = document.createElement('div');
-          backDiv.classList.add('flipcard-back');
-          backDiv.textContent = `Answer: ${card.answer}`;
-
-          // Clicking the card toggles front/back
-          cardDiv.addEventListener('click', () => {
-            if (frontDiv.style.display === 'block') {
-              frontDiv.style.display = 'none';
-              backDiv.style.display = 'block';
-            } else {
-              frontDiv.style.display = 'block';
-              backDiv.style.display = 'none';
-            }
-          });
-
-          cardDiv.appendChild(frontDiv);
-          cardDiv.appendChild(backDiv);
-        }
-
-        // Remove button (works in either mode)
-        const removeBtn = document.createElement('button');
-        removeBtn.textContent = "Remove";
-        removeBtn.classList.add('remove-btn');
-        removeBtn.addEventListener('click', (e) => {
-          e.stopPropagation(); // So we don't trigger flip on remove
-          const realIndex = activeFlashcards.indexOf(card);
-          if (realIndex >= 0) {
-            activeFlashcards.splice(realIndex, 1);
+        function loadInitialData() {
+            // Update display using the number, let updateStats add the '%'
+            bestScoreDisplay.textContent = bestScore;
+            loadQuestionSets();
+            const availableSets = Object.keys(JSON.parse(localStorage.getItem(QUESTION_SETS_KEY) || '{}'));
+            if (!availableSets.includes(currentSetName)) { currentSetName = availableSets.length > 0 ? availableSets[0] : 'default-set'; }
+            loadQuestions(currentSetName);
+            if (questions.length === 0 && availableSets.length > 0 && currentSetName === 'default-set' && availableSets[0] !== 'default-set') { currentSetName = availableSets[0]; loadQuestions(currentSetName); }
             renderFlashcards();
-          }
-        });
-        cardDiv.appendChild(removeBtn);
-
-        container.appendChild(cardDiv);
-      });
-    }
-
-    /**********************************************************
-     * Submit & Reset
-     **********************************************************/
-    function runConfetti() {
-      const duration = 2000;
-      const end = Date.now() + duration;
-      (function frame() {
-        confetti({
-          particleCount: 3,
-          startVelocity: 15,
-          spread: 360,
-          ticks: 60,
-          origin: { x: Math.random(), y: Math.random() - 0.1 }
-        });
-        if (Date.now() < end) requestAnimationFrame(frame);
-      })();
-    }
-
-    function submitTest() {
-  if (!activeFlashcards.length) {
-    alert("No questions to submit!");
-    return;
-  }
-
-  let score = 0;
-  activeFlashcards.forEach((card, index) => {
-    // Check if user selected the right answer
-    const isCorrect = card.selected && (card.selected === card.answer);
-    if (isCorrect) {
-      score++;
-      updateNextDueInSet(card, true);
-    } else {
-      updateNextDueInSet(card, false);
-    }
-
-    // Grab the .flashcard DOM element
-    const cardDiv = container.children[index];
-    // Find the .feedback div
-    const feedbackEl = cardDiv.querySelector('.feedback');
-
-    // Clear old feedback classes
-    feedbackEl.classList.remove('correct', 'incorrect');
-
-    // Show new feedback
-    if (isCorrect) {
-      feedbackEl.classList.add('correct');
-      feedbackEl.textContent = 'Correct!';
-    } else {
-      feedbackEl.classList.add('incorrect');
-      feedbackEl.textContent = 'Incorrect. The right answer is: ' + card.answer;
-    }
-    feedbackEl.style.display = 'block';
-  });
-
-  // Calculate overall score
-  const total = activeFlashcards.length;
-  const percent = Math.round((score / total) * 100);
-  scoreDiv.textContent = `You answered ${score} out of ${total} correctly (${percent}%).`;
-
-  // Success or fail sound + confetti
-  if (percent >= 70) {
-    successSound.play().catch(err => console.log("Success sound error:", err));
-    runConfetti();
-  } else {
-    failSound.play().catch(err => console.log("Fail sound error:", err));
-  }
-
-  // Show time taken
-  const timeTaken = Math.floor((Date.now() - startTime) / 1000);
-  timeTakenDiv.textContent = `Time Taken: ${timeTaken} seconds`;
-
-  // Update best score
-  if (percent > bestScore) {
-    bestScore = percent;
-    localStorage.setItem('bestScore', bestScore);
-    bestScoreDiv.textContent = `Best Score (All Time): ${bestScore}%`;
-  }
-
-  // Show the floating "Reset Test" button
-  resetFloatingBtn.style.display = 'block';
-}
-
-
-    function updateNextDueInSet(card, isCorrect) {
-      if (!currentSetName) return;
-      const setArray = flashcardSets[currentSetName];
-      if (!setArray) return;
-      const idx = setArray.findIndex(c => c.question === card.question);
-      if (idx >= 0) {
-        setArray[idx].selected = card.selected;
-        setArray[idx].nextDue = isCorrect
-          ? Date.now() + 3 * 24 * 60 * 60 * 1000
-          : Date.now() + 1 * 24 * 60 * 60 * 1000;
-      }
-    }
-
-    function resetTest() {
-      activeFlashcards.forEach(card => { card.selected = null; });
-      scoreDiv.textContent = 'You answered 0 out of 0 correctly (0%).';
-      timeTakenDiv.textContent = 'Time Taken: 0 seconds';
-      renderFlashcards();
-      startTime = Date.now();
-      resetFloatingBtn.style.display = 'none';
-    }
-
-    /**********************************************************
-     * Add / Remove All
-     **********************************************************/
-    function addQuestion() {
-      if (!currentSetName) {
-        alert("Please select or create a set before adding questions!");
-        return;
-      }
-      const questionText = newQuestionEl.value.trim();
-      if (!questionText) {
-        alert("Please enter a question.");
-        return;
-      }
-      const chosenCorrect = document.querySelector('input[name="correctOption"]:checked');
-      const correctIndex = chosenCorrect ? parseInt(chosenCorrect.value, 10) : 0;
-      const newOptions = [];
-      optionEls.forEach(el => {
-        const val = el.value.trim();
-        if (val) newOptions.push(val);
-      });
-      if (newOptions.length === 0) {
-        alert("Please enter at least one option.");
-        return;
-      }
-      if (correctIndex >= newOptions.length) {
-        alert("The correct answer index is beyond the number of options you provided.");
-        return;
-      }
-
-      const correctAnswer = newOptions[correctIndex];
-      const newCard = {
-        question: questionText,
-        options: newOptions,
-        answer: correctAnswer,
-        nextDue: 0
-      };
-
-      // Add to the set data
-      flashcardSets[currentSetName].push(newCard);
-      saveSetsToLocalStorage();
-
-      // Also add to the activeFlashcards
-      activeFlashcards.push(structuredClone(newCard));
-
-      // Clear form
-      newQuestionEl.value = "";
-      optionEls.forEach(el => el.value = "");
-      document.querySelector('input[name="correctOption"][value="0"]').checked = true;
-      renderFlashcards();
-    }
-
-    function removeAllQuestions() {
-      if (!activeFlashcards.length) {
-        alert("No questions to remove.");
-        return;
-      }
-      if (confirm("Remove all currently loaded questions (set data remains)?")) {
-        activeFlashcards = [];
-        renderFlashcards();
-        alert("All active questions cleared.");
-      }
-    }
-
-    /**********************************************************
-     * "Save as New Set" (replaces prompt)
-     **********************************************************/
-    function showNewSetDialog() {
-      newSetNameInput.value = "";
-      newSetDialog.style.display = "block";
-    }
-    function hideNewSetDialog() {
-      newSetDialog.style.display = "none";
-    }
-    function saveCurrentAsNewSet(newName) {
-      if (!activeFlashcards.length) {
-        alert("No questions to save!");
-        return;
-      }
-      if (!newName) {
-        alert("Save canceled, no name provided.");
-        return;
-      }
-      if (flashcardSets[newName]) {
-        alert(`A set named "${newName}" already exists. Please choose another name.`);
-        return;
-      }
-      flashcardSets[newName] = activeFlashcards.map(card => structuredClone(card));
-      saveSetsToLocalStorage();
-      populateSetDropdown();
-      alert(`Saved ${activeFlashcards.length} questions as new set "${newName}".`);
-    }
-    newSetNameConfirmBtn.addEventListener('click', () => {
-      const newName = newSetNameInput.value.trim();
-      hideNewSetDialog();
-      saveCurrentAsNewSet(newName);
-    });
-    newSetNameCancelBtn.addEventListener('click', () => {
-      hideNewSetDialog();
-      alert("Save canceled.");
-    });
-
-    /**********************************************************
-     * CSV Import (replaces prompt)
-     **********************************************************/
-    function showImportCSVDialog() {
-      importSetNameInput.value = "";
-      importCSVDialog.style.display = "block";
-    }
-    function hideImportCSVDialog() {
-      importCSVDialog.style.display = "none";
-    }
-    function parseCsv(csvText) {
-      const lines = csvText.split(/\r?\n/).map(l => l.trim()).filter(l => l);
-      const result = [];
-      lines.forEach(line => {
-        const parts = line.split(";");
-        if (parts.length < 3) return;
-        const question = parts[0];
-        const correctAnswer = parts[parts.length - 1];
-        const rawOptions = parts.slice(1, parts.length - 1);
-        const newCard = {
-          question,
-          options: rawOptions,
-          answer: correctAnswer,
-          nextDue: 0
-        };
-        result.push(newCard);
-      });
-      return result;
-    }
-    function importFromCSV(setName) {
-      const file = csvFileInput.files[0];
-      if (!file) {
-        alert("Please select a .csv file first!");
-        return;
-      }
-      if (!setName) {
-        alert("Import canceled, no set name provided.");
-        return;
-      }
-
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const text = e.target.result;
-        const newCards = parseCsv(text);
-        if (!newCards.length) {
-          alert("No questions found in the CSV or format not recognized.");
-          return;
+            updateStats(); // Update stats correctly formats the best score display
         }
-        flashcardSets[setName] = newCards;
-        saveSetsToLocalStorage();
-        populateSetDropdown();
-        alert(`Added ${newCards.length} questions into set "${setName}"!`);
-      };
-      reader.readAsText(file);
-    }
-    importSetNameConfirmBtn.addEventListener('click', () => {
-      const setName = importSetNameInput.value.trim();
-      hideImportCSVDialog();
-      importFromCSV(setName);
-    });
-    importSetNameCancelBtn.addEventListener('click', () => {
-      hideImportCSVDialog();
-      alert("Import canceled.");
-    });
 
-    /**********************************************************
-     * Load a chosen set
-     **********************************************************/
-    function loadSelectedSet() {
-      const chosen = setSelect.value;
-      if (!chosen) {
-        alert("No set selected!");
-        return;
-      }
-      currentSetName = chosen;
-      const setArray = flashcardSets[chosen] || [];
-      activeFlashcards = setArray.map(c => structuredClone(c));
-      renderFlashcards();
-    }
-
-    /**********************************************************
-     * Initialization
-     **********************************************************/
-    function initApp() {
-      loadSetsFromLocalStorage();
-      if (localStorage.getItem('bestScore')) {
-        bestScore = parseInt(localStorage.getItem('bestScore'), 10);
-        bestScoreDiv.textContent = `Best Score (All Time): ${bestScore}%`;
-      }
-      populateSetDropdown();
-      startTime = Date.now();
-    }
-
-    /**********************************************************
-     * Event Listeners
-     **********************************************************/
-    removeAllBtn.addEventListener('click', removeAllQuestions);
-    shuffleBtn.addEventListener('click', () => {
-      if (activeFlashcards.length) {
-        for (let i = activeFlashcards.length - 1; i > 0; i--) {
-          const j = Math.floor(Math.random() * (i + 1));
-          [activeFlashcards[i], activeFlashcards[j]] = [activeFlashcards[j], activeFlashcards[i]];
+        function loadQuestionSets() { /* ... same ... */
+            const sets = JSON.parse(localStorage.getItem(QUESTION_SETS_KEY) || '{}'); setSelect.innerHTML = ''; let setNames = Object.keys(sets);
+            if (setNames.length === 0 || !setNames.includes('default-set')) { sets['default-set'] = sets['default-set'] || []; localStorage.setItem(QUESTION_SETS_KEY, JSON.stringify(sets)); setNames = Object.keys(sets); }
+            setNames.sort().forEach(name => { const option = document.createElement('option'); option.value = option.textContent = name; setSelect.appendChild(option); });
+            if (!setNames.includes(currentSetName)) { currentSetName = setNames.length > 0 ? setNames[0] : 'default-set'; } setSelect.value = currentSetName;
         }
-      }
-      renderFlashcards();
-    });
-    resetBtn.addEventListener('click', resetTest);
-    submitBtn.addEventListener('click', submitTest);
-    addQuestionBtn.addEventListener('click', addQuestion);
-    csvImportBtn.addEventListener('click', showImportCSVDialog);
-    loadSetBtn.addEventListener('click', loadSelectedSet);
-    deleteSetBtn.addEventListener('click', deleteSelectedSet);
-    saveCurrentAsSetBtn.addEventListener('click', showNewSetDialog);
-    resetFloatingBtn.addEventListener('click', resetTest);
+        function saveQuestions(setName = currentSetName) { /* ... same ... */
+            if (!setName) { console.error("Save failed: No set name."); return; } const sets = JSON.parse(localStorage.getItem(QUESTION_SETS_KEY) || '{}');
+            const questionsToSave = questions.map(q => ({ id: q.id || Date.now() + Math.random(), ...q })); sets[setName] = questionsToSave;
+            localStorage.setItem(QUESTION_SETS_KEY, JSON.stringify(sets));
+            if (!setSelect.querySelector(`option[value="${setName}"]`)) { loadQuestionSets(); } setSelect.value = setName;
+        }
+        function loadQuestions(setName) { /* ... same ... */
+            const sets = JSON.parse(localStorage.getItem(QUESTION_SETS_KEY) || '{}');
+            questions = (sets[setName] || []).map(q => ({ id: q.id || Date.now() + Math.random(), ...q }));
+            if (!sets[setName]) { console.warn(`Set "${setName}" empty/not found.`); if (!sets['default-set']) { sets['default-set'] = []; localStorage.setItem(QUESTION_SETS_KEY, JSON.stringify(sets)); } }
+            currentSetName = setName; setSelect.value = currentSetName; resetTestState(); renderFlashcards(); updateStats(); console.log(`Loaded set: ${setName}`);
+        }
 
-    // Flip Mode toggle
-    flipModeBtn.addEventListener('click', () => {
-      flipMode = !flipMode;
-      flipModeBtn.textContent = flipMode ? "Flip Mode: ON" : "Flip Mode: OFF";
-      renderFlashcards();
-    });
+        function renderFlashcards() { /* ... same render logic ... */
+            container.innerHTML = ''; document.body.classList.toggle('edit-mode-active', editMode);
+            if (questions.length === 0) { container.innerHTML = '<p>Set empty. Add/Import questions.</p>'; updateStats(); return; }
+            questions.forEach((q, index) => {
+                const card = document.createElement('div'); card.className = 'flashcard'; card.dataset.index = index; q.id = q.id || Date.now() + Math.random(); card.dataset.cardId = q.id; q.options = Array.isArray(q.options) ? q.options : [];
+                if (flipMode && !editMode) { card.innerHTML = `<div class="question-part"><div class="question-text">Q${index + 1}: ${escapeHtml(q.question)}</div></div><div class="answer-part"><div class="answer-text">${escapeHtml(q.correctAnswer)}</div></div>`; card.addEventListener('click', () => card.classList.toggle('flipped')); }
+                else if (editMode) { let optsHTML = q.options.map((opt, oi) => `<div class="edit-option-group" data-opt-index="${oi}"><input type="radio" name="correct-edit-${q.id}" value="${oi}" ${opt === q.correctAnswer ? 'checked' : ''} class="edit-correct-radio"><input type="text" value="${escapeHtml(opt)}" class="edit-option-input"><button class="remove-option-btn" title="Remove Option">X</button></div>`).join(''); while ((optsHTML.match(/edit-option-group/g) || []).length < 2) { const ni = (optsHTML.match(/edit-option-group/g) || []).length; optsHTML += `<div class="edit-option-group" data-opt-index="${ni}"><input type="radio" name="correct-edit-${q.id}" value="${ni}" class="edit-correct-radio"><input type="text" value="" placeholder="New Option" class="edit-option-input"><button class="remove-option-btn" title="Remove Option">X</button></div>`; } card.innerHTML = `<div class="edit-controls"><label>Question:</label><textarea rows="3">${escapeHtml(q.question)}</textarea><label>Options:</label><div class="options-edit-container">${optsHTML}</div><button class="add-option-btn" style="font-size:0.8em;padding:3px 6px;margin-bottom:10px;">+ Add Option</button><div class="edit-action-buttons"><button class="save-card-btn">Save Q${index + 1}</button><button class="cancel-card-edit-btn">Cancel</button></div><button class="remove-card-btn">Remove Card</button></div>`; }
+                else { const optsList = document.createElement('ul'); optsList.className = 'options'; q.options.forEach((o, oi) => { const li = document.createElement('li'); li.textContent = escapeHtml(o); li.dataset.optIndex = oi; if (!testSubmitted) li.addEventListener('click', () => selectAnswer(index, oi, li)); if (testSubmitted) { if (o === q.correctAnswer) li.classList.add('correct'); else if (userAnswers[index] === oi) li.classList.add('incorrect'); li.style.cursor = 'default'; } else if (userAnswers[index] === oi) li.classList.add('selected'); optsList.appendChild(li); }); const fbDiv = document.createElement('div'); fbDiv.className = 'feedback'; if (testSubmitted && userAnswers[index] !== undefined) { const selTxt = q.options[userAnswers[index]]; if (selTxt === q.correctAnswer) { fbDiv.textContent = 'Correct!'; fbDiv.classList.add('correct'); } else { fbDiv.textContent = `Incorrect. Answer: ${escapeHtml(q.correctAnswer)}`; fbDiv.classList.add('incorrect'); } } card.innerHTML = `<div class="question-text">Q${index + 1}: ${escapeHtml(q.question)}</div>`; card.appendChild(optsList); card.appendChild(fbDiv); }
+                container.appendChild(card);
+            }); updateStats();
+        }
 
-    initApp();
-  </script>
+        function saveEdit(index) { /* ... same logic ... */
+            const cardDiv = container.querySelector(`.flashcard[data-index='${index}']`); const cardId = cardDiv?.dataset.cardId; const ta = cardDiv?.querySelector('textarea'); const optsCont = cardDiv?.querySelector('.options-edit-container'); if (!cardDiv || !cardId || !ta || !optsCont) { alert("Save Error."); return; } const qTxt = ta.value.trim(); let opts = []; let ans = null; let checked = false; optsCont.querySelectorAll('.edit-option-group').forEach(g => { const i = g.querySelector('.edit-option-input'); const r = g.querySelector('.edit-correct-radio'); if (i && i.value.trim()) { const optTxt = i.value.trim(); opts.push(optTxt); if (r && r.checked) { ans = optTxt; checked = true; } } }); if (!qTxt || opts.length < 2 || !checked || ans === null) { alert("Enter Q, >= 2 options, & mark correct."); return; } const qIdx = questions.findIndex(q => q.id == cardId); if (qIdx === -1) { alert("Update Error."); return; } questions[qIdx] = { ...questions[qIdx], question: qTxt, options: opts, correctAnswer: ans }; saveQuestions(); renderFlashcards(); console.log(`Q${qIdx + 1} updated.`);
+        }
+        function addOptionField(cardDiv) { /* ... same logic ... */
+             if (!cardDiv || !editMode) return; const optsCont = cardDiv.querySelector('.options-edit-container'); const addBtn = cardDiv.querySelector('.add-option-btn'); if (!optsCont || !addBtn) return; const rows = optsCont.querySelectorAll('.edit-option-group'); const nextIdx = rows.length; const cId = cardDiv.dataset.cardId; if (nextIdx >= 5) { alert("Max 5 options."); return; } const newGrp = document.createElement('div'); newGrp.className = 'edit-option-group'; newGrp.dataset.optIndex = nextIdx; newGrp.innerHTML = `<input type="radio" name="correct-edit-${cId}" value="${nextIdx}" class="edit-correct-radio"><input type="text" value="" class="edit-option-input" placeholder="New Option"><button class="remove-option-btn" title="Remove Option">X</button>`; optsCont.appendChild(newGrp); if (nextIdx + 1 >= 5) addBtn.disabled = true; const allRemBtns = optsCont.querySelectorAll('.remove-option-btn'); if (allRemBtns.length > 2) allRemBtns.forEach(b => b.disabled = false);
+        }
+        function removeOptionField(optionGroup) { /* ... same logic ... */
+            if (!optionGroup || !editMode) return; const cardDiv = optionGroup.closest('.flashcard'); const optsCont = optionGroup.closest('.options-edit-container'); if (!cardDiv || !optsCont) return; const rows = optsCont.querySelectorAll('.edit-option-group'); if (rows.length <= 2) { alert("Min 2 options."); return; } optionGroup.remove(); const remRows = optsCont.querySelectorAll('.edit-option-group'); const cId = cardDiv.dataset.cardId; remRows.forEach((row, newIdx) => { row.dataset.optIndex = newIdx; row.querySelector('.edit-correct-radio').value = newIdx; row.querySelector('.edit-correct-radio').name = `correct-edit-${cId}`; const remBtn = row.querySelector('.remove-option-btn'); if (remBtn) remBtn.disabled = (remRows.length <= 2 && newIdx < 2); }); const addBtn = cardDiv.querySelector('.add-option-btn'); if (addBtn) addBtn.disabled = (remRows.length >= 5);
+        }
+        function cancelEdit() { /* ... same logic ... */ if (editMode) { editMode = false; editModeBtn.textContent = "Edit Mode: OFF"; renderFlashcards(); } }
+        function removeQuestion(index) { /* ... same logic ... */ const cardIdToRemove = questions[index]?.id; if (!cardIdToRemove) return; if (confirm(`Remove Q ${index + 1} permanently?`)) { questions = questions.filter(q => q.id !== cardIdToRemove); userAnswers = {}; saveQuestions(); renderFlashcards(); updateStats(); } }
+        function selectAnswer(questionIndex, optionIndex, selectedLi) { /* ... same logic ... */ if (testSubmitted || flipMode || editMode) return; userAnswers[questionIndex] = optionIndex; const optionsInCard = container.querySelectorAll(`.flashcard[data-index='${questionIndex}'] .options li`); optionsInCard.forEach(li => li.classList.remove('selected')); selectedLi.classList.add('selected'); }
+
+        addQuestionForm.addEventListener('submit', (e) => { /* ... same logic ... */ e.preventDefault(); const qTxt = questionInput.value.trim(); let opts = []; optionInputs.forEach(i => { if (i.value.trim()) opts.push(i.value.trim()); }); const correctRadio = addQuestionForm.querySelector('input[name="correct-option-add"]:checked'); if (!qTxt || opts.length < 2 || !correctRadio) { alert('Q, >=2 Options, & Mark Correct needed.'); return; } const cIdx = parseInt(correctRadio.value, 10); if (isNaN(cIdx) || cIdx < 0 || cIdx >= opts.length) { alert('Invalid Correct Option.'); return; } questions.push({ id: Date.now() + Math.random(), question: qTxt, options: opts, correctAnswer: opts[cIdx] }); saveQuestions(); renderFlashcards(); updateStats(); addQuestionForm.reset(); correctOptionRadios.forEach(r => r.checked = false); optionInputs.forEach(i => i.value = ''); questionInput.value = ''; console.log('Added question.'); });
+
+        submitBtn.addEventListener('click', () => { /* ... same logic + scroll ... */
+            if (testSubmitted || flipMode || editMode || questions.length === 0) return;
+            testSubmitted = true; clearInterval(timerInterval); score = 0;
+            questions.forEach((q, index) => { if (userAnswers[index] !== undefined && q.options[userAnswers[index]] === q.correctAnswer) score++; });
+            const percentage = questions.length > 0 ? Math.round((score / questions.length) * 100) : 0;
+            if (percentage > bestScore) {
+                bestScore = percentage;
+                // Store only the number in localStorage
+                localStorage.setItem('capybaraBestScore', bestScore);
+            }
+            renderFlashcards(); updateStats(); console.log(`Submitted. Score: ${score}/${questions.length}`);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        function updateStats() {
+            const total = questions.length;
+            scoreDisplay.textContent = score;
+            totalQuestionsDisplay.textContent = total;
+            const percentage = total > 0 ? Math.round((score / total) * 100) : 0;
+            percentageDisplay.textContent = testSubmitted ? percentage : 0;
+            // Add the '%' sign here when displaying
+            bestScoreDisplay.textContent = `${bestScore}%`;
+        }
+
+        function startTimer() { /* ... same ... */ if (timerInterval) clearInterval(timerInterval); startTime = Date.now(); timerInterval = setInterval(() => { timerDisplay.textContent = `${Math.floor((Date.now() - startTime) / 1000)}s`; }, 1000); }
+        function resetTestState() { /* ... same ... */ userAnswers = {}; score = 0; testSubmitted = false; clearInterval(timerInterval); timerDisplay.textContent = '0s'; if (!flipMode && !editMode) startTimer(); }
+        resetBtn.addEventListener('click', () => { resetTestState(); renderFlashcards(); updateStats(); console.log('Reset.'); });
+        shuffleBtn.addEventListener('click', () => { /* ... same ... */ for (let i=questions.length-1; i>0; i--) { const j=Math.floor(Math.random()*(i+1)); [questions[i],questions[j]]=[questions[j],questions[i]]; } resetTestState(); renderFlashcards(); updateStats(); console.log('Shuffled.'); });
+        removeAllBtn.addEventListener('click', () => { /* ... same ... */ if (confirm(`Remove all ${questions.length} cards from set "${currentSetName}"?`)) { questions = []; resetTestState(); saveQuestions(); renderFlashcards(); updateStats(); console.log(`Removed all from set "${currentSetName}".`); } });
+        // --- Mode Toggles ---
+        flipModeBtn.addEventListener('click', () => { /* ... same ... */ flipMode = !flipMode; if (flipMode) editMode = false; flipModeBtn.textContent = flipMode ? "Flip Mode: ON" : "Flip Mode: OFF"; editModeBtn.textContent = "Edit Mode: OFF"; resetTestState(); renderFlashcards(); if (!flipMode && !editMode) { startTimer();} else { clearInterval(timerInterval); timerDisplay.textContent = '0s';} });
+        editModeBtn.addEventListener('click', () => { /* ... same ... */ editMode = !editMode; if (editMode) flipMode = false; editModeBtn.textContent = editMode ? "Edit Mode: ON" : "Edit Mode: OFF"; flipModeBtn.textContent = "Flip Mode: OFF"; resetTestState(); renderFlashcards(); if (!flipMode && !editMode) { startTimer();} else { clearInterval(timerInterval); timerDisplay.textContent = '0s';} });
+        // --- Set Management Listeners ---
+        loadSetBtn.addEventListener('click', () => { const sn=setSelect.value; if(sn) loadQuestions(sn); else alert("Select set."); });
+        saveSetBtn.addEventListener('click', () => { const nn=newSetNameInput.value.trim(); if(!nn){alert("Enter name.");return;} const s=JSON.parse(localStorage.getItem(QUESTION_SETS_KEY)||'{}'); if(s[nn]){if(!confirm(`Set "${nn}" exists. Overwrite?`))return;} currentSetName=nn; saveQuestions(nn); newSetNameInput.value=''; alert(`Saved as: "${nn}"`); });
+        deleteSetBtn.addEventListener('click', () => { const sn=setSelect.value; if(!sn){alert("Select set.");return;} if(sn==='default-set'){alert("Cannot delete 'default-set'.");return;} if(confirm(`Delete set "${sn}"?`)){ const s=JSON.parse(localStorage.getItem(QUESTION_SETS_KEY)||'{}'); delete s[sn]; localStorage.setItem(QUESTION_SETS_KEY,JSON.stringify(s)); loadQuestionSets(); const av=Object.keys(JSON.parse(localStorage.getItem(QUESTION_SETS_KEY)||'{}')); loadQuestions(av.includes('default-set')?'default-set':(av[0]||'default-set')); alert(`Set "${sn}" deleted.`); } });
+        // --- Import/Export Listeners & Functions ---
+        function parseCSV(text) { /* ... same ... */ const lines=text.split(/[\r\n]+/).filter(l=>l.trim()); const qs=[]; lines.forEach((l,i)=>{ try{const p=[];let c='',iq=false;for(let h of l){if(h==='"'&&!iq){iq=true}else if(h==='"'&&iq){iq=false}else if(h===';'&&!iq){p.push(c.trim().replace(/^"|"$/g,'').replace(/""/g,'"'));c=''}else{c+=h}}p.push(c.trim().replace(/^"|"$/g,'').replace(/""/g,'"'));if(p.length<3)throw E;const q=p[0],a=p[p.length-1],o=p.slice(1,-1).filter(Boolean);if(!q||o.length<1||!a||!o.includes(a))throw E;qs.push({question:q,options:o,correctAnswer:a});}catch(e){console.warn(`Skip L${i+1}: ${e.message}`)} }); return qs; }
+        function parseJSON(text) { /* ... same ... */ try { const d=JSON.parse(text); if(!Array.isArray(d)) throw E; return d.map((item,i)=>{if(!item||!item.question||!Array.isArray(item.options)||item.options.length<1||!item.correctAnswer||!item.options.includes(item.correctAnswer))throw new Error(`Invalid ${i}`); return {question:String(item.question),options:item.options.map(String).filter(Boolean),correctAnswer:String(item.correctAnswer)};}); } catch(e){alert(`JSON Err: ${e.message}`);return null;} }
+        function handleImport(addToCurrent, newSetName = null) { /* ... same logic ... */ const file = importFile.files[0]; if (!file) { alert("Select file."); return; } const reader = new FileReader(); reader.onload = (event) => { const text = event.target.result; let impQs = null; const type = file.name.split('.').pop().toLowerCase(); if (type === 'csv' || type === 'txt') impQs = parseCSV(text); else if (type === 'json') impQs = parseJSON(text); else { alert("Use .csv/txt/json"); return; } if (!impQs || impQs.length === 0) { alert("No valid questions."); return; } impQs = impQs.map(q => ({ id: Date.now() + Math.random(), ...q })); if (addToCurrent) { questions = questions.concat(impQs); saveQuestions(); loadQuestions(currentSetName); alert(`Added ${impQs.length} to "${currentSetName}".`); } else if (newSetName) { const sets = JSON.parse(localStorage.getItem(QUESTION_SETS_KEY) || '{}'); if (sets[newSetName]) { if (!confirm(`Set "${newSetName}" exists. Overwrite?`)) return; } questions = impQs; currentSetName = newSetName; saveQuestions(newSetName); importNewSetNameInput.value = ''; alert(`Imported ${impQs.length} as "${newSetName}".`); } importFile.value = ''; }; reader.onerror = () => alert("Read Error."); reader.readAsText(file); }
+        importToCurrentBtn.addEventListener('click', () => handleImport(true));
+        importToNewBtn.addEventListener('click', () => { const nn = importNewSetNameInput.value.trim(); if (!nn) { alert("Enter set name."); return; } handleImport(false, nn); });
+        function formatCSV() { /* ... same ... */ return questions.map(q=>[q.question,...q.options,q.correctAnswer].map(p=>`"${String(p).replace(/"/g,'""')}"`).join(';')).join('\n'); }
+        function formatJSON() { /* ... same ... */ return JSON.stringify(questions, null, 2); }
+        exportBtn.addEventListener('click', () => { /* ... same logic ... */ if (questions.length === 0) { alert("Set empty."); return; } const format = exportFormatSelect.value; let content = '', ext = '', mime = ''; if (format === 'csv' || format === 'txt') { content = formatCSV(); ext = format; mime = 'text/csv'; } else if (format === 'json') { content = formatJSON(); ext = 'json'; mime = 'application/json'; } else { alert("Invalid format."); return; } const blob = new Blob([content], { type: `${mime};charset=utf-8;` }); const link = document.createElement("a"); const url = URL.createObjectURL(blob); link.href = url; const safeName = currentSetName.replace(/[^a-z0-9]/gi, '_').toLowerCase() || 'flashcard_set'; link.download = `${safeName}_export.${ext}`; document.body.appendChild(link); link.click(); document.body.removeChild(link); URL.revokeObjectURL(url); console.log(`Exported "${currentSetName}" as ${format.toUpperCase()}`); });
+
+        // --- Inline Edit Event Delegation ---
+         container.addEventListener('click', function(event) { /* ... same delegation logic ... */ const target = event.target; const cardDiv = target.closest('.flashcard'); if (!cardDiv || !editMode) return; const index = parseInt(cardDiv.dataset.index, 10); if (isNaN(index)) return; if (target.classList.contains('save-card-btn')) { saveEdit(index); } else if (target.classList.contains('cancel-card-edit-btn')) { cancelEdit(); } else if (target.classList.contains('remove-card-btn')) { removeQuestion(index); } else if (target.classList.contains('add-option-btn')) { addOptionField(cardDiv); } else if (target.classList.contains('remove-option-btn')) { const og = target.closest('.edit-option-group'); if (og) removeOptionField(og); } });
+
+        // --- Utility ---
+        function escapeHtml(text) { const m={'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}; return String(text??'').replace(/[&<>"']/g, i=>m[i]); }
+
+        // --- Initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // Explicitly parse as float here too
+             bestScore = parseFloat(localStorage.getItem('capybaraBestScore')) || 0;
+             loadInitialData();
+             if (!flipMode && !editMode) startTimer();
+        });
+
+    </script>
+
 </body>
 </html>
